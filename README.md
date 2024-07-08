@@ -26,7 +26,7 @@
 - Deployed Frontend can be accessed here [Front End]()  
 - Deployed Backend can be accessed here [backend End]()
 - UI Design [Figma Design]()
-- SQL TABLE[]()
+- SQL TABLE[ED diagram](https://dbdiagram.io/d/668bb33b9939893dae50a66b)
 
 ## Technologies used
 - Frontend
@@ -47,3 +47,7 @@
 - [Raddames Tonui](raddamestonui95@gmail.com)
 - [Brian Rotich](rotichbrian891@gmail.com)
 - [Rehema Somo]()
+
+
+
+bwefnasdfibjiabgjibjiasvbasdvjasfbv
