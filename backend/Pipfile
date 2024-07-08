@@ -10,6 +10,7 @@ sqlalchemy-serializer = "*"
 flask-bcrypt = "*"
 flask-cors = "*"
 flask-jwt-extended = "*"
+faker = "*"
 
 [dev-packages]
 
