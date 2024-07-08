@@ -5,6 +5,7 @@
 - Raddames Tonui
 - Brian Rotich
 - Rehema Somo
+- James Nyakundi
 
 ## Project Description
 - Normal User (Job Seeker) Capabilities:
@@ -46,8 +47,6 @@
 ## Support and contact details
 - [Raddames Tonui](raddamestonui95@gmail.com)
 - [Brian Rotich](rotichbrian891@gmail.com)
-- [Rehema Somo]()
+- [Rehema Somo](rehemasomo30@gmail.com)
+- [James Nyakundi](Omarejames082@gmail.cokCom)
 
-
-
-bwefnasdfibjiabgjibjiasvbasdvjasfbv
