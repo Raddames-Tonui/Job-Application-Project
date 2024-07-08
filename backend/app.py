@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 from models import db, User, Job, Company, Application
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///jobs_database.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.json.compact = False  # To display each key/value pair on a separate line
 
