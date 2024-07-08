@@ -22,9 +22,8 @@ class User(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
 
     applications = db.relationship("Application", back_populates="user", cascade="all, delete-orphan")
-    jobs = association_proxy("applications", "job", creator=lambda job: Application(job=job))
 
-    serialize_rules = ('-password', '-applications.user', '-created_at', '-updated_at')
+    serialize_rules = ('-password', '-applications.user', '-created_at', '-updated_at', '-jobs')
 
     def to_dict(self):
         return {
@@ -33,7 +32,8 @@ class User(db.Model, SerializerMixin):
             "email": self.email,
             "profile_pictures": self.profile_pictures,
             "is_admin": self.is_admin,
-            "jobs": [job.to_dict(rules=('-applications', '-created_at', '-updated_at')) for job in self.jobs],
+            # Exclude jobs to avoid circular reference
+            # "jobs": [job.to_dict() for job in self.jobs],
         }
 
 class Job(db.Model, SerializerMixin):
@@ -59,8 +59,8 @@ class Job(db.Model, SerializerMixin):
             "title": self.title,
             "description": self.description,
             "requirements": self.requirements,
-            "company": self.company.to_dict(rules=('-jobs', '-created_at', '-updated_at')),
-            "users": [user.to_dict(rules=('-applications', '-created_at', '-updated_at')) for user in self.users],
+            "company": self.company.to_dict(),
+            "users": [user.to_dict() for user in self.users],
         }
 
 class Company(db.Model, SerializerMixin):
