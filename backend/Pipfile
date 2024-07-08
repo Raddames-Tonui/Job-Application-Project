@@ -11,6 +11,7 @@ flask-bcrypt = "*"
 flask-cors = "*"
 flask-jwt-extended = "*"
 faker = "*"
+flask-migrate = "*"
 
 [dev-packages]
 
