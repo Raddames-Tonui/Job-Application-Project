@@ -22,6 +22,9 @@ class User(db.Model, SerializerMixin):
 
     applications = db.relationship("Application", back_populates="user", cascade="all, delete-orphan")
 
+    
+    serialize_rules = ('-password', '-applications.user', '-created_at', '-updated_at')
+
 class Job(db.Model, SerializerMixin):
     __tablename__ = "jobs"
 
@@ -36,6 +39,9 @@ class Job(db.Model, SerializerMixin):
     company = db.relationship("Company", back_populates="jobs")
     applications = db.relationship("Application", back_populates="job", cascade="all, delete-orphan")
 
+    
+    serialize_rules = ('-applications.job', '-created_at', '-updated_at')
+
 class Company(db.Model, SerializerMixin):
     __tablename__ = "companies"
 
@@ -48,6 +54,9 @@ class Company(db.Model, SerializerMixin):
 
     jobs = db.relationship("Job", back_populates="company")
 
+    
+    serialize_rules = ('-jobs.company', '-created_at', '-updated_at')
+    
 # Association table to store many-to-many relationship between job and user
 class Application(db.Model, SerializerMixin):
     __tablename__ = "applications"
@@ -62,3 +71,6 @@ class Application(db.Model, SerializerMixin):
 
     user = db.relationship("User", back_populates="applications")
     job = db.relationship("Job", back_populates="applications")
+
+    
+    serialize_rules = ('-user.applications', '-job.applications', '-created_at', '-updated_at')
