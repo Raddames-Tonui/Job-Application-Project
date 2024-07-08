@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData, func
 from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.ext.associationproxy import association_proxy
 
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
@@ -21,9 +22,19 @@ class User(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
 
     applications = db.relationship("Application", back_populates="user", cascade="all, delete-orphan")
+    jobs = association_proxy("applications", "job", creator=lambda job: Application(job=job))
 
-    
     serialize_rules = ('-password', '-applications.user', '-created_at', '-updated_at')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "profile_pictures": self.profile_pictures,
+            "is_admin": self.is_admin,
+            "jobs": [job.to_dict(rules=('-applications', '-created_at', '-updated_at')) for job in self.jobs],
+        }
 
 class Job(db.Model, SerializerMixin):
     __tablename__ = "jobs"
@@ -38,9 +49,19 @@ class Job(db.Model, SerializerMixin):
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
     company = db.relationship("Company", back_populates="jobs")
     applications = db.relationship("Application", back_populates="job", cascade="all, delete-orphan")
+    users = association_proxy("applications", "user", creator=lambda user: Application(user=user))
 
-    
     serialize_rules = ('-applications.job', '-created_at', '-updated_at')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "requirements": self.requirements,
+            "company": self.company.to_dict(rules=('-jobs', '-created_at', '-updated_at')),
+            "users": [user.to_dict(rules=('-applications', '-created_at', '-updated_at')) for user in self.users],
+        }
 
 class Company(db.Model, SerializerMixin):
     __tablename__ = "companies"
@@ -54,10 +75,16 @@ class Company(db.Model, SerializerMixin):
 
     jobs = db.relationship("Job", back_populates="company")
 
-    
     serialize_rules = ('-jobs.company', '-created_at', '-updated_at')
-    
-# Association table to store many-to-many relationship between job and user
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "location": self.location,
+        }
+
 class Application(db.Model, SerializerMixin):
     __tablename__ = "applications"
 
@@ -72,5 +99,12 @@ class Application(db.Model, SerializerMixin):
     user = db.relationship("User", back_populates="applications")
     job = db.relationship("Job", back_populates="applications")
 
-    
     serialize_rules = ('-user.applications', '-job.applications', '-created_at', '-updated_at')
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "status": self.status,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+        }
