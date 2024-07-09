@@ -13,6 +13,7 @@ def seed_data():
         db.drop_all()
         db.create_all()
         
+        
     
         password_hash = hashpw('password'.encode('utf-8'), gensalt())
         users = [
@@ -20,7 +21,7 @@ def seed_data():
             User(username='user1', email='user1@example.com', password=password_hash, is_admin=False, profile_pictures="http://example.com/profile2.jpg"),
             User(username='user2', email='user2@example.com', password=password_hash, is_admin=False, profile_pictures="http://example.com/profile3.jpg")
         ]
-
+#  password=bcrypt.generate_password_hash(data['password']).decode('utf-8')
         for _ in range(10):  
             users.append(User(username=faker.user_name(), email=faker.email(), password=hashpw(faker.password().encode('utf-8'), gensalt()), profile_pictures=faker.image_url()))
 

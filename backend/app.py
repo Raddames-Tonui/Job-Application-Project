@@ -1,15 +1,24 @@
+# !/usr/bin/env python
+
+import random
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from models import db, User, Job, Company, Application
 from sqlalchemy.exc import IntegrityError
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.json.compact = False  # For pretty JSON output in Flask responses
+app.config["JWT_SECRET_KEY"] = "$hhjdfsjhk43834892893" + str(random.randint(1, 1000000))
+app.config["SECRET_KEY"] = "$hhjd4%^#7&893" + str(random.randint(1, 1000000))
+app.json.compact = False 
 
 db.init_app(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
 
@@ -41,7 +50,7 @@ def create_user():
     new_user = User(
         username=data['username'],
         email=data['email'],
-        password=data['password'],
+        password=bcrypt.generate_password_hash(data['password']).decode('utf-8'),
         profile_pictures=data.get('profile_pictures'),
         is_admin=data.get('is_admin', False)
     )
