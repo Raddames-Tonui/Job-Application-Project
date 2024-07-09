@@ -1,5 +1,7 @@
 import React from 'react';
-const Login = () => {
+import { Link } from 'react-router-dom';
+
+const LoginPage = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
@@ -15,13 +17,12 @@ const Login = () => {
     event.target.reset();
   };
 
-
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold mb-4">Welcome Back!</h1>
         <p className="text-gray-600 mb-8">Log in to your account to continue</p>
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700" htmlFor="email">
               Email
@@ -29,8 +30,10 @@ const Login = () => {
             <input
               type="email"
               id="email"
+              name="email"
               className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your email"
+              required
             />
           </div>
           <div className="mb-6">
@@ -40,15 +43,17 @@ const Login = () => {
             <input
               type="password"
               id="password"
+              name="password"
               className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your password"
+              required
             />
           </div>
           <div className="flex justify-between items-center mb-6">
             <div>
-              <a href="#" className="text-sm text-blue-600 hover:underline">
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
                 Forgot Password?
-              </a>
+              </Link>
             </div>
           </div>
           <button
@@ -59,7 +64,9 @@ const Login = () => {
           </button>
         </form>
         <div className="mt-6 text-center">
-          <p className="text-gray-700">New to our platform? <a href="#" className="text-blue-600 hover:underline">Sign Up here</a></p>
+          <p className="text-gray-700">
+            New to our platform? <Link to="/signup" className="text-blue-600 hover:underline">Sign Up here</Link>
+          </p>
         </div>
       </div>
     </div>

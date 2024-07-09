@@ -1,23 +1,22 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './components/LandingPage.jsx'; 
+import LoginPage from './components/LoginPage.jsx';
+import RegisterCompanyPage from './components/RegisterCompanyPage.jsx';
+import JobSearchPage from './components/JobSearchPage.jsx';
+import Navbar from './components/Navbar.jsx';
 
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import LandingPage from '/home/rehema/Job-Application-Project/frontend/src/components/Landingpage.jsx';
-import LoginPage from '/home/rehema/Job-Application-Project/frontend/src/components/loginPage.jsx';
-import RegisterCompanyPage from '/home/rehema/Job-Application-Project/frontend/src/components/Registercompanies.jsx';
-import JobSearchPage from '/home/rehema/Job-Application-Project/frontend/src/components/jobsearch.jsx';
-import Navbar from '/home/rehema/Job-Application-Project/frontend/src/components/Navbar.jsx';
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Navbar />
-        <Switch>
-          <Route path="/" exact component={LandingPage} />
-          <Route path="/login" component={LoginPage} />
-          <Route path="/register-company" component={RegisterCompanyPage} />
-          <Route path="/search-jobs" component={JobSearchPage} />
-        </Switch>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register-company" element={<RegisterCompanyPage />} />
+          <Route path="/search-jobs" element={<JobSearchPage />} />
+        </Routes>
       </div>
     </Router>
   );

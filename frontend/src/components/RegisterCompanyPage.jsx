@@ -1,7 +1,7 @@
 import React from 'react';
 
 const RegisterCompany = () => {
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const companyData = {
@@ -10,12 +10,30 @@ const RegisterCompany = () => {
       location: formData.get('location'),
     };
     
-    console.log('Company Data:', companyData);
-    
+    try {
+      const response = await fetch('/api/register-company', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(companyData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      
+      const result = await response.json();
+      console.log('Company registered successfully:', result);
+      // Optionally display a success message or redirect to another page
+    } catch (error) {
+      console.error('Error registering company:', error);
+      // Optionally display an error message to the user
+    }
+
     // Reset the form 
     event.target.reset();
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
