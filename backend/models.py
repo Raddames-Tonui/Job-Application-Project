@@ -32,8 +32,6 @@ class User(db.Model, SerializerMixin):
             "email": self.email,
             "profile_pictures": self.profile_pictures,
             "is_admin": self.is_admin,
-            # Exclude jobs to avoid circular reference
-            # "jobs": [job.to_dict() for job in self.jobs],
         }
 
 class Job(db.Model, SerializerMixin):
