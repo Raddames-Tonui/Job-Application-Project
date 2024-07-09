@@ -1,25 +1,66 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from models import db, User, Job, Company, Application
 from sqlalchemy.exc import IntegrityError
+from bcrypt import hashpw, gensalt, checkpw
+from dotenv import load_dotenv
+import os
+import datetime
+
+load_dotenv()
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY") 
 app.json.compact = False  # For pretty JSON output in Flask responses
 
 db.init_app(app)
 migrate = Migrate(app, db)
+jwt = JWTManager(app)
 
 
 @app.route('/')
 def home():
     return jsonify({"message": "Welcome to the Job Portal API"}), 200
 
+# ===================== AUTHENTICATION ==================
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    hashed_password = hashpw(data['password'].encode('utf-8'), gensalt())
+    new_user = User(
+        username=data['username'], 
+        password=hashed_password, 
+        email=data['email'],
+        profile_pictures=data.get('profile_pictures'),
+        is_admin=data.get('is_admin', False)
+        )
+    
+    try:
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"message": "User registered successfully"}), 201
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({"message": "User with this email or username already exists"}), 400
+    
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    user = User.query.filter_by(email=data['email']).first()
+    if user and checkpw(data['password'].encode('utf-8'), user.password):
+        access_token = create_access_token(identity=user.id, expires_delta=datetime.timedelta(days=1))
+        return jsonify({"message": "Login successful", "access_token": access_token}), 200
+    else:
+        return jsonify({"message": "Invalid credentials"}), 401
+
 #  ===================== USERS ==========================
 # GET all users
 @app.route('/users', methods=['GET'])
+@jwt_required()
 def get_all_users():
     users = User.query.all()
     user_list = [user.to_dict() for user in users]
@@ -27,6 +68,7 @@ def get_all_users():
 
 # GET a specific user by ID
 @app.route('/users/<int:id>', methods=['GET'])
+@jwt_required()
 def get_user(id):
     user = User.query.get(id)
     if user is None:
@@ -35,13 +77,15 @@ def get_user(id):
 
 # POST create a new user
 @app.route('/users', methods=['POST'])
+@jwt_required
 def create_user():
     data = request.get_json()
+    hashed_password = hashpw(data['password'].encode('utf-8'), gensalt())
 
     new_user = User(
         username=data['username'],
         email=data['email'],
-        password=data['password'],
+        password=hashed_password,
         profile_pictures=data.get('profile_pictures'),
         is_admin=data.get('is_admin', False)
     )
@@ -55,43 +99,34 @@ def create_user():
         return jsonify({"message": "User with this email or username already exists"}), 400
 
 # PUT update a user by ID
-@app.route('/users/<int:id>', methods=['PUT'])
-def update_user(id):
+@app.route('/users/<int:id>', methods=['PUT', 'PATCH'])
+@jwt_required
+def put_update_user(id):
     data = request.get_json()
 
     user = User.query.get(id)
     if user is None:
         return jsonify({"message": "User not found"}), 404
 
-    user.username = data.get('username', user.username)
-    user.email = data.get('email', user.email)
-    user.password = data.get('password', user.password)
+    if request.method == 'PUT':
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        user.password = hashpw(data['password'].encode('utf-8'), gensalt()) if 'password' in data else user.password
+    elif request.method == 'PATCH':
+        user.username = data.get('username', user.username)
+        user.email = data.get('email', user.email)
+        user.password = hashpw(data['password'].encode('utf-8'), gensalt()) if 'password' in data else user.password
+
     user.profile_pictures = data.get('profile_pictures', user.profile_pictures)
     user.is_admin = data.get('is_admin', user.is_admin)
 
     db.session.commit()
     return jsonify({"message": "User updated successfully", "user": user.to_dict()}), 200
 
-# PATCH update a user by ID
-@app.route('/users/<int:id>', methods=['PATCH'])
-def partial_update_user(id):
-    data = request.get_json()
-
-    user = User.query.get(id)
-    if user is None:
-        return jsonify({"message": "User not found"}), 404
-
-    user.username = data.get('username', user.username)
-    user.email = data.get('email', user.email)
-    user.password = data.get('password', user.password)
-    user.profile_pictures = data.get('profile_pictures', user.profile_pictures)
-    user.is_admin = data.get('is_admin', user.is_admin)
-
-    db.session.commit()
-    return jsonify({"message": "User updated successfully", "user": user.to_dict()}), 200
 
 # DELETE a user by ID
 @app.route('/users/<int:id>', methods=['DELETE'])
+@jwt_required
 def delete_user(id):
     user = User.query.get(id)
     if user is None:
@@ -107,6 +142,7 @@ def delete_user(id):
 
 # GET all jobs
 @app.route('/jobs', methods=['GET'])
+@jwt_required
 def get_all_jobs():
     jobs = Job.query.all()
     job_list = [job.to_dict() for job in jobs]
@@ -117,6 +153,7 @@ def get_all_jobs():
 
 # GET a specific job by ID
 @app.route('/jobs/<int:id>', methods=['GET'])
+@jwt_required
 def get_job(id):
     job = Job.query.get(id)
     if not job:
@@ -126,6 +163,7 @@ def get_job(id):
 
 # POST create a new job
 @app.route('/jobs', methods=['POST'])
+@jwt_required
 def create_job():
     data = request.get_json()
 
@@ -143,6 +181,7 @@ def create_job():
 
 # PATCH update a job by ID
 @app.route('/jobs/<int:id>', methods=['PATCH'])
+@jwt_required
 def update_job(id):
     job = Job.query.get(id)
     if not job:
@@ -167,6 +206,7 @@ def update_job(id):
 
 # PUT replace a job by ID
 @app.route('/jobs/<int:id>', methods=['PUT'])
+@jwt_required
 def replace_job(id):
     job = Job.query.get(id)
     if not job:
@@ -184,6 +224,7 @@ def replace_job(id):
 
 # DELETE a job by ID
 @app.route('/jobs/<int:id>', methods=['DELETE'])
+@jwt_required
 def delete_job(id):
     job = Job.query.get(id)
     if not job:
@@ -199,6 +240,7 @@ def delete_job(id):
 
 # GET all companies
 @app.route('/companies', methods=['GET'])
+@jwt_required
 def get_all_companies():
     companies = Company.query.all()
     company_list = [company.to_dict() for company in companies]
@@ -209,6 +251,7 @@ def get_all_companies():
 
 # GET a specific company by ID
 @app.route('/companies/<int:id>', methods=['GET'])
+@jwt_required
 def get_company(id):
     company = Company.query.get(id)
     if not company:
@@ -217,6 +260,7 @@ def get_company(id):
 
 # POST create a new company
 @app.route('/companies', methods=['POST'])
+@jwt_required
 def create_company():
     data = request.get_json()
 
@@ -232,12 +276,15 @@ def create_company():
 
 # PATCH update a specific company by ID
 @app.route('/companies/<int:id>', methods=['PATCH'])
+@jwt_required
 def update_company(id):
     data = request.get_json()
 
     company = Company.query.get(id)
     if not company:
         return jsonify({"message": "Company not found"}), 404
+    
+
 
     if 'name' in data:
         company.name = data['name']
@@ -261,8 +308,26 @@ def update_company(id):
     db.session.commit()
     return jsonify({"message": "Company updated successfully", "company": company.to_dict()}), 200
 
+# PUT replace a company by ID
+@app.route('/companies/<int:id>', methods=['PUT'])
+@jwt_required
+def replace_company(id):
+    data = request.get_json()
+    company = Company.query.get(id)
+    if not company:
+        return jsonify({"message": "Company not found"}), 404
+        
+    company.name = data['name']
+    company.description = data['description']
+    company.location = data['location']
+    
+    db.session.commit()
+    return jsonify({"message": "Company updated successfully", "company": company.to_dict()}), 200
+
+
 # DELETE a specific company by ID
 @app.route('/companies/<int:id>', methods=['DELETE'])
+@jwt_required
 def delete_company(id):
     company = Company.query.get(id)
     if not company:
@@ -277,6 +342,7 @@ def delete_company(id):
 
 # GET all applications
 @app.route('/applications', methods=['GET'])
+@jwt_required
 def get_all_applications():
     applications = Application.query.all()
     if applications:
@@ -286,6 +352,7 @@ def get_all_applications():
     
 # GET a specific application by ID
 @app.route('/applications/<int:application_id>', methods=['GET'])
+@jwt_required
 def get_application(application_id):
     application = Application.query.get(application_id)
     if not application:
@@ -294,6 +361,7 @@ def get_application(application_id):
 
 # POST create a new application
 @app.route('/applications', methods=['POST'])
+@jwt_required
 def create_application():
     data = request.get_json()
 
@@ -309,6 +377,7 @@ def create_application():
 
 # PUT update an application by ID
 @app.route('/applications/<int:application_id>', methods=['PUT'])
+@jwt_required
 def update_application(application_id):
     data = request.get_json()
 
@@ -338,6 +407,7 @@ def update_application(application_id):
 
 # PATCH partially update an application by ID
 @app.route('/applications/<int:application_id>', methods=['PATCH'])
+@jwt_required
 def partial_update_application(application_id):
     data = request.get_json()
 
@@ -367,6 +437,7 @@ def partial_update_application(application_id):
 
 # DELETE an application by ID
 @app.route('/applications/<int:application_id>', methods=['DELETE'])
+@jwt_required
 def delete_application(application_id):
     application = Application.query.get(application_id)
     if not application:
