@@ -1,17 +1,73 @@
+# !/usr/bin/env python
+
+import random
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from models import db, User, Job, Company, Application
+from datetime import timedelta
 from sqlalchemy.exc import IntegrityError
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required,  get_jwt
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.json.compact = False  # For pretty JSON output in Flask responses
+app.config["JWT_SECRET_KEY"] = "$hhjdfsjhk43834892893" + str(random.randint(1, 1000000))
+app.config["SECRET_KEY"] = "$hhjd4%^#7&893" + str(random.randint(1, 1000000))
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
+
+app.json.compact = False 
 
 db.init_app(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
+
+# =========================================AUTHENTICATION=================================================
+# Login
+@app.route("/login", methods=["POST"])
+def login():
+    email = request.json.get("email", None)
+    password = request.json.get("password", None)
+
+    user = User.query.filter_by(email=email).first()
+
+    if user and bcrypt.check_password_hash(user.password, password):
+        access_token = create_access_token(identity = user.id)
+        return jsonify(access_token=access_token)
+    else:
+        return jsonify({"message": "Invalid username or password"}), 401
+
+# Fetch current user
+@app.route("/current_user", methods=["GET"])
+@jwt_required()
+def get_current_user():
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if current_user:
+        return jsonify({"id" :current_user.id, "username": current_user.username, "email": current_user.email, "profile_pictures": current_user.profile_pictures, "is_admin": current_user.is_admin}), 200
+    else:
+        return jsonify({"Error": "User not found"}), 404
+
+# Logout
+BLACKLIST = set()
+
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blocklist(jwt_header, decrypted_token):
+    return decrypted_token["jti"] in BLACKLIST
+
+@app.route("/logout", methods=["POST"])
+@jwt_required()
+def logout():   
+    jti = get_jwt()["jti"]
+    BLACKLIST.add(jti)    
+    return jsonify({"messsage": "Successfully logged out"}), 200
+    
+
+# ============================================ ROUTES ==============================================
 
 @app.route('/')
 def home():
@@ -41,7 +97,7 @@ def create_user():
     new_user = User(
         username=data['username'],
         email=data['email'],
-        password=data['password'],
+        password=bcrypt.generate_password_hash(data['password']).decode('utf-8'),
         profile_pictures=data.get('profile_pictures'),
         is_admin=data.get('is_admin', False)
     )
@@ -126,6 +182,7 @@ def get_job(id):
 
 # POST create a new job
 @app.route('/jobs', methods=['POST'])
+@jwt_required()
 def create_job():
     data = request.get_json()
 
