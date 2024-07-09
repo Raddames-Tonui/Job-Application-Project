@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LandingPage from './components/LandingPage.jsx'; 
-import LoginPage from './components/LoginPage.jsx';
-import RegisterCompanyPage from './components/RegisterCompanyPage.jsx';
-import JobSearchPage from './components/JobSearchPage.jsx';
+import LandingPage from './pages/LandingPage.jsx'; 
+import LoginPage from './pages/LoginPage.jsx';
+import RegisterCompanyPage from './pages/RegisterCompanyPage.jsx';
+import JobSearchPage from './pages/JobSearchPage.jsx';
 import Navbar from './components/Navbar.jsx';
 
 
