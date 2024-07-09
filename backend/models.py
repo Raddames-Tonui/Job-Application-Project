@@ -45,6 +45,7 @@ class Job(db.Model, SerializerMixin):
     updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
 
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
+
     company = db.relationship("Company", back_populates="jobs")
     applications = db.relationship("Application", back_populates="job", cascade="all, delete-orphan")
     users = association_proxy("applications", "user", creator=lambda user: Application(user=user))
@@ -71,7 +72,7 @@ class Company(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=func.now())
     updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
 
-    jobs = db.relationship("Job", back_populates="company")
+    jobs = db.relationship("Job", back_populates="company",  cascade="all, delete-orphan")
 
     serialize_rules = ('-jobs.company', '-created_at', '-updated_at')
 

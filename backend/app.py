@@ -193,6 +193,16 @@ def company(id):
         if 'location' in data:
             company.location = data['location']
 
+        # Update jobs related to this company if company_id is provided
+        if 'jobs' in data:
+            for job_data in data['jobs']:
+                job_id = job_data.get('id')
+                if job_id:
+                    job = Job.query.get(job_id)
+                    if job:
+                        job.company_id = company.id
+                        db.session.commit()
+
         db.session.commit()
         return jsonify({"message": "Company updated successfully", "company": company.to_dict()}), 200
 
@@ -203,6 +213,7 @@ def company(id):
 
     else:
         return jsonify({"message": "Method not allowed"}), 405
+
 
 
 # ======================APPLICATION ROUTES======================
@@ -244,8 +255,22 @@ def application(application_id):
         if 'status' in data:
             application.status = data['status']
 
+        if 'job_id' in data:
+            job = Job.query.get(data['job_id'])
+            if job:
+                application.job = job
+            else:
+                return jsonify({"message": "Job not found"}), 404
+
+        if 'user_id' in data:
+            user = User.query.get(data['user_id'])
+            if user:
+                application.user = user
+            else:
+                return jsonify({"message": "User not found"}), 404
+
         db.session.commit()
-        return jsonify({"message": "Application status updated successfully", "application": application.to_dict()}), 200
+        return jsonify({"message": "Application updated successfully", "application": application.to_dict()}), 200
 
     elif request.method == 'DELETE':
         db.session.delete(application)
