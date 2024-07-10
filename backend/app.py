@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 import random
 from flask import Flask, jsonify, request
@@ -8,9 +8,13 @@ from models import db, User, Job, Company, Application
 from datetime import timedelta
 from sqlalchemy.exc import IntegrityError
 from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required,  get_jwt
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required, get_jwt
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
+
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET_KEY"] = "$hhjdfsjhk43834892893" + str(random.randint(1, 1000000))
@@ -24,7 +28,6 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
 
-
 # =========================================AUTHENTICATION=================================================
 # Login
 @app.route("/login", methods=["POST"])
@@ -35,7 +38,7 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if user and bcrypt.check_password_hash(user.password, password):
-        access_token = create_access_token(identity = user.id)
+        access_token = create_access_token(identity=user.id)
         return jsonify(access_token=access_token)
     else:
         return jsonify({"message": "Invalid username or password"}), 401
@@ -48,7 +51,12 @@ def get_current_user():
     current_user = User.query.get(current_user_id)
 
     if current_user:
-        return jsonify({"id" :current_user.id, "username": current_user.username, "email": current_user.email, "profile_pictures": current_user.profile_pictures, "is_admin": current_user.is_admin}), 200
+        return jsonify({
+            "id": current_user.id,
+            "username": current_user.username,
+            "email": current_user.email,
+            "is_admin": current_user.is_admin
+        }), 200
     else:
         return jsonify({"Error": "User not found"}), 404
 
@@ -61,11 +69,10 @@ def check_if_token_in_blocklist(jwt_header, decrypted_token):
 
 @app.route("/logout", methods=["POST"])
 @jwt_required()
-def logout():   
+def logout():
     jti = get_jwt()["jti"]
-    BLACKLIST.add(jti)    
+    BLACKLIST.add(jti)
     return jsonify({"messsage": "Successfully logged out"}), 200
-    
 
 # ============================================ ROUTES ==============================================
 
@@ -98,8 +105,8 @@ def create_user():
         username=data['username'],
         email=data['email'],
         password=bcrypt.generate_password_hash(data['password']).decode('utf-8'),
-        profile_pictures=data.get('profile_pictures'),
-        is_admin=data.get('is_admin', False)
+        is_admin=data.get('is_admin', False),
+        profile_pictures = data.get('profile_pictures', None)
     )
 
     try:
@@ -121,8 +128,8 @@ def update_user(id):
 
     user.username = data.get('username', user.username)
     user.email = data.get('email', user.email)
-    user.password = data.get('password', user.password)
-    user.profile_pictures = data.get('profile_pictures', user.profile_pictures)
+    if 'password' in data:
+        user.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user.is_admin = data.get('is_admin', user.is_admin)
 
     db.session.commit()
@@ -139,8 +146,8 @@ def partial_update_user(id):
 
     user.username = data.get('username', user.username)
     user.email = data.get('email', user.email)
-    user.password = data.get('password', user.password)
-    user.profile_pictures = data.get('profile_pictures', user.profile_pictures)
+    if 'password' in data:
+        user.password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
     user.is_admin = data.get('is_admin', user.is_admin)
 
     db.session.commit()
@@ -157,8 +164,6 @@ def delete_user(id):
     db.session.commit()
     return jsonify({"message": "User deleted successfully"}), 200
 
-
-
 # ======================JOB ROUTES=======================
 
 # GET all jobs
@@ -166,10 +171,7 @@ def delete_user(id):
 def get_all_jobs():
     jobs = Job.query.all()
     job_list = [job.to_dict() for job in jobs]
-    if jobs:
-        return jsonify({"jobs": job_list}), 200
-    else:
-        return jsonify({"message": "No jobs found"}), 404
+    return jsonify({"jobs": job_list}), 200
 
 # GET a specific job by ID
 @app.route('/jobs/<int:id>', methods=['GET'])
@@ -179,11 +181,16 @@ def get_job(id):
         return jsonify({"message": "Job not found"}), 404
     return jsonify(job.to_dict()), 200
 
-
 # POST create a new job
 @app.route('/jobs', methods=['POST'])
 @jwt_required()
 def create_job():
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if not current_user.is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
+
     data = request.get_json()
 
     new_job = Job(
@@ -197,10 +204,16 @@ def create_job():
     db.session.commit()
     return jsonify({"message": "Job created successfully", "job": new_job.to_dict()}), 201
 
-
 # PATCH update a job by ID
 @app.route('/jobs/<int:id>', methods=['PATCH'])
+@jwt_required()
 def update_job(id):
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if not current_user.is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
+
     job = Job.query.get(id)
     if not job:
         return jsonify({"message": "Job not found"}), 404
@@ -224,7 +237,14 @@ def update_job(id):
 
 # PUT replace a job by ID
 @app.route('/jobs/<int:id>', methods=['PUT'])
+@jwt_required()
 def replace_job(id):
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if not current_user.is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
+
     job = Job.query.get(id)
     if not job:
         return jsonify({"message": "Job not found"}), 404
@@ -241,7 +261,14 @@ def replace_job(id):
 
 # DELETE a job by ID
 @app.route('/jobs/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_job(id):
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if not current_user.is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
+
     job = Job.query.get(id)
     if not job:
         return jsonify({"message": "Job not found"}), 404
@@ -250,19 +277,22 @@ def delete_job(id):
     db.session.commit()
     return jsonify({"message": "Job deleted successfully"}), 200
 
+# Job search endpoint
+@app.route('/jobs/search', methods=['GET'])
+def search_jobs():
+    query = request.args.get('query', '')
+    jobs = Job.query.filter(Job.title.ilike(f'%{query}%') | Job.description.ilike(f'%{query}%')).all()
+    job_list = [job.to_dict() for job in jobs]
+    return jsonify({"jobs": job_list}), 200 if jobs else jsonify({"message": "No jobs found"}), 404
 
-
-# ======================COMPANY ROUTES======================
+# =====================COMPANY ROUTES====================
 
 # GET all companies
 @app.route('/companies', methods=['GET'])
 def get_all_companies():
     companies = Company.query.all()
     company_list = [company.to_dict() for company in companies]
-    if companies:
-        return jsonify({"companies": company_list}), 200
-    else:
-        return jsonify({"message": "No companies found"}), 404
+    return jsonify(company_list), 200
 
 # GET a specific company by ID
 @app.route('/companies/<int:id>', methods=['GET'])
@@ -274,7 +304,14 @@ def get_company(id):
 
 # POST create a new company
 @app.route('/companies', methods=['POST'])
+@jwt_required()
 def create_company():
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if not current_user.is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
+
     data = request.get_json()
 
     new_company = Company(
@@ -287,14 +324,21 @@ def create_company():
     db.session.commit()
     return jsonify({"message": "Company created successfully", "company": new_company.to_dict()}), 201
 
-# PATCH update a specific company by ID
+# PATCH update a company by ID
 @app.route('/companies/<int:id>', methods=['PATCH'])
+@jwt_required()
 def update_company(id):
-    data = request.get_json()
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if not current_user.is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
 
     company = Company.query.get(id)
     if not company:
         return jsonify({"message": "Company not found"}), 404
+
+    data = request.get_json()
 
     if 'name' in data:
         company.name = data['name']
@@ -305,22 +349,19 @@ def update_company(id):
     if 'location' in data:
         company.location = data['location']
 
-    # Update jobs related to this company if 'jobs' is provided in data
-    if 'jobs' in data:
-        for job_data in data['jobs']:
-            job_id = job_data.get('id')
-            if job_id:
-                job = Job.query.get(job_id)
-                if job:
-                    job.company_id = company.id
-                    db.session.commit()
-
     db.session.commit()
     return jsonify({"message": "Company updated successfully", "company": company.to_dict()}), 200
 
-# DELETE a specific company by ID
+# DELETE a company by ID
 @app.route('/companies/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_company(id):
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if not current_user.is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
+
     company = Company.query.get(id)
     if not company:
         return jsonify({"message": "Company not found"}), 404
@@ -329,110 +370,118 @@ def delete_company(id):
     db.session.commit()
     return jsonify({"message": "Company deleted successfully"}), 200
 
-
-# ======================APPLICATION ROUTES======================
+# ====================APPLICATION ROUTES=================
 
 # GET all applications
 @app.route('/applications', methods=['GET'])
 def get_all_applications():
     applications = Application.query.all()
-    if applications:
-        return jsonify({"applications": [application.to_dict() for application in applications]}), 200
-    else:
-        return jsonify({"message": "No applications found"}), 404
-    
+    application_list = [application.to_dict() for application in applications]
+    return jsonify(application_list), 200
+
 # GET a specific application by ID
-@app.route('/applications/<int:application_id>', methods=['GET'])
-def get_application(application_id):
-    application = Application.query.get(application_id)
+@app.route('/applications/<int:id>', methods=['GET'])
+def get_application(id):
+    application = Application.query.get(id)
     if not application:
         return jsonify({"message": "Application not found"}), 404
-    return jsonify({"application": application.to_dict()}), 200
+    return jsonify(application.to_dict()), 200
 
 # POST create a new application
 @app.route('/applications', methods=['POST'])
+@jwt_required()
 def create_application():
+    current_user_id = get_jwt_identity()
     data = request.get_json()
 
     new_application = Application(
-        user_id=data['user_id'],
+        user_id=current_user_id,
         job_id=data['job_id'],
-        status=data.get('status', 'pending')
+        status=data['status']
     )
 
     db.session.add(new_application)
     db.session.commit()
     return jsonify({"message": "Application created successfully", "application": new_application.to_dict()}), 201
 
-# PUT update an application by ID
-@app.route('/applications/<int:application_id>', methods=['PUT'])
-def update_application(application_id):
-    data = request.get_json()
+# PATCH update an application by ID
+@app.route('/applications/<int:id>', methods=['PATCH'])
+@jwt_required()
+def update_application(id):
+    current_user_id = get_jwt_identity()
+    application = Application.query.get(id)
 
-    application = Application.query.get(application_id)
     if not application:
         return jsonify({"message": "Application not found"}), 404
+
+    if not application.user_id == current_user_id and not User.query.get(current_user_id).is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
+
+    data = request.get_json()
 
     if 'status' in data:
         application.status = data['status']
 
-    if 'job_id' in data:
-        job = Job.query.get(data['job_id'])
-        if job:
-            application.job = job
-        else:
-            return jsonify({"message": "Job not found"}), 404
-
-    if 'user_id' in data:
-        user = User.query.get(data['user_id'])
-        if user:
-            application.user = user
-        else:
-            return jsonify({"message": "User not found"}), 404
-
     db.session.commit()
     return jsonify({"message": "Application updated successfully", "application": application.to_dict()}), 200
 
-# PATCH partially update an application by ID
-@app.route('/applications/<int:application_id>', methods=['PATCH'])
-def partial_update_application(application_id):
-    data = request.get_json()
+# PUT replace an application by ID
+@app.route('/applications/<int:id>', methods=['PUT'])
+@jwt_required()
+def replace_application(id):
+    current_user_id = get_jwt_identity()
+    application = Application.query.get(id)
 
-    application = Application.query.get(application_id)
     if not application:
         return jsonify({"message": "Application not found"}), 404
 
-    if 'status' in data:
-        application.status = data['status']
+    if not application.user_id == current_user_id and not User.query.get(current_user_id).is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
 
-    if 'job_id' in data:
-        job = Job.query.get(data['job_id'])
-        if job:
-            application.job = job
-        else:
-            return jsonify({"message": "Job not found"}), 404
+    data = request.get_json()
 
-    if 'user_id' in data:
-        user = User.query.get(data['user_id'])
-        if user:
-            application.user = user
-        else:
-            return jsonify({"message": "User not found"}), 404
+    application.job_id = data['job_id']
+    application.status = data['status']
 
     db.session.commit()
-    return jsonify({"message": "Application updated successfully", "application": application.to_dict()}), 200
+    return jsonify({"message": "Application replaced successfully", "application": application.to_dict()}), 200
 
 # DELETE an application by ID
-@app.route('/applications/<int:application_id>', methods=['DELETE'])
-def delete_application(application_id):
-    application = Application.query.get(application_id)
+@app.route('/applications/<int:id>', methods=['DELETE'])
+@jwt_required()
+def delete_application(id):
+    current_user_id = get_jwt_identity()
+    application = Application.query.get(id)
+
     if not application:
         return jsonify({"message": "Application not found"}), 404
+
+    if not application.user_id == current_user_id and not User.query.get(current_user_id).is_admin:
+        return jsonify({"message": "Access forbidden"}), 403
 
     db.session.delete(application)
     db.session.commit()
     return jsonify({"message": "Application deleted successfully"}), 200
 
+# GET applications for a specific user
+@app.route('/users/<int:user_id>/applications', methods=['GET'])
+def get_user_applications(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"message": "User not found"}), 404
 
-if __name__ == "__main__":
+    applications = Application.query.filter_by(user_id=user_id).all()
+    return jsonify({"applications": [application.to_dict() for application in applications]}), 200
+
+# GET applications for a specific job
+@app.route('/jobs/<int:job_id>/applications', methods=['GET'])
+def get_job_applications(job_id):
+    job = Job.query.get(job_id)
+    if not job:
+        return jsonify({"message": "Job not found"}), 404
+
+    applications = Application.query.filter_by(job_id=job_id).all()
+    return jsonify({"applications": [application.to_dict() for application in applications]}), 200
+
+if __name__ == '__main__':
     app.run(debug=True, port=5555)

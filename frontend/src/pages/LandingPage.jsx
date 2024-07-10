@@ -1,46 +1,51 @@
-import React, { useState } from 'react';
-const LandingPage = () => {
-  const [email, setEmail] = useState('');
+import React from "react";
+import backgroundImage from "../assets/cover_photo.jpg"; // Adjust the path according to your project structure
+import AvailableJobs from "./components/AvaiableJobs";
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Subscribe user to newsletter
-    console.log('Subscribing email:', email);
-    // Reset the form
-    setEmail('');
-  };
-
+function LandingPage() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white p-8 rounded shadow-lg">
-        <h1 className="text-3xl font-bold mb-4">Welcome to Job Portal</h1>
-        <p className="text-gray-600 mb-4">Explore and find your dream job today!</p>
-
-        {/* Signup Form */}
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+    <div
+      className="bg-white pt-16 pb-32 px-4 sm:px-6 lg:pb-40 lg:px-8"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        height: "100vh",
+      }}
+    >
+      <div className="relative bg-white bg-opacity-75 p-6 rounded-lg shadow-lg">
+        <h1 className=" text-center text-4xl font-bold leading-10 text-gray-900">
+          There Is <span className="text-blue-500">Definitely An Opportunity</span>  Here
+          For You!
+        </h1>
+        <p className="text-center mt-4 text-lg text-gray-600">
+          Find Jobs, Employment & Career Opportunities
+        </p>
+        <div className="mt-10 flex justify-center">
+          <div className="bg-white shadow-md rounded-lg p-4 flex">
             <input
-              id="email"
-              type="email"
-              className="w-full border-gray-300 rounded px-4 py-2"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              className="p-2 rounded-l-md border border-gray-300"
+              placeholder="Job title, keywords, or company"
             />
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
             <input
-              id="password"
-              type="password"
-              className="w-full border-gray-300 rounded px-4 py-2"
-              placeholder="Enter your password"
+              type="text"
+              className="p-2 border border-gray-300"
+              placeholder="City or postcode"
             />
+            <button className="p-2 bg-blue-500 text-white rounded-r-md">
+              Find Jobs
+            </button>
           </div>
-          <button type="submit" className="bg-blue-500 text-white rounded px-4 py-2 hover:bg-blue-600 transition-colors duration-300">Sign Up</button>
-        </form>
+        </div>
+        
+        <div className="mt-10 flex justify-center"></div>
       </div>
+      <div className="">
+       
+      </div>
+      
     </div>
   );
 }
