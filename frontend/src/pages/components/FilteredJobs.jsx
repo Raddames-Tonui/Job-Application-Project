@@ -1,5 +1,5 @@
 import React from 'react';
-import JobCard from '../components/JobCard';
+import JobCardSearch from './JobCardSearch';
 
 const FilteredJobs = ({ filteredJobs }) => {
 
@@ -12,7 +12,7 @@ const FilteredJobs = ({ filteredJobs }) => {
         <li>
           {limitedJobs.length > 0 ? (
             limitedJobs.map((job) => (
-              <JobCard key={job.id} job={job} />
+              <JobCardSearch key={job.id} job={job} />
             ))
           ) : (
             <p className="col-span-full text-center md:w-[60vw] text-gray-700">
