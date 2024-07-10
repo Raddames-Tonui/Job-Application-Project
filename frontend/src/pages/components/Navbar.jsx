@@ -28,7 +28,6 @@ function Navbar() {
           <li><Link to="/" className="hover:text-gray-300">Home</Link></li>
           <li><Link to="/login" className="hover:text-gray-300">Login</Link></li>
           <li><Link to="/register-company" className="hover:text-gray-300">Register Company</Link></li>
-          <li><Link to="/search-jobs" className="hover:text-gray-300">Search Jobs</Link></li>
         </ul>
       </div>
     </nav>

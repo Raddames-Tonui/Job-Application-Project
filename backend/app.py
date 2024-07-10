@@ -414,8 +414,6 @@ def update_application(id):
     if not application:
         return jsonify({"message": "Application not found"}), 404
 
-    if not application.user_id == current_user_id and not User.query.get(current_user_id).is_admin:
-        return jsonify({"message": "Access forbidden"}), 403
 
     data = request.get_json()
 
@@ -435,8 +433,6 @@ def replace_application(id):
     if not application:
         return jsonify({"message": "Application not found"}), 404
 
-    if not application.user_id == current_user_id and not User.query.get(current_user_id).is_admin:
-        return jsonify({"message": "Access forbidden"}), 403
 
     data = request.get_json()
 
@@ -456,8 +452,6 @@ def delete_application(id):
     if not application:
         return jsonify({"message": "Application not found"}), 404
 
-    if not application.user_id == current_user_id and not User.query.get(current_user_id).is_amin(False):
-        return jsonify({"message": "Access forbidden"}), 403
 
     db.session.delete(application)
     db.session.commit()

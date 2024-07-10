@@ -25,6 +25,7 @@ export const JobProvider = ({ children }) => {
   }, []);
 
   return (
+        // Provide the jobs, fetchJobs function, and error state to the context consumers
     <JobContext.Provider value={{ jobs, fetchJobs, error }}>
       {children}
     </JobContext.Provider>
