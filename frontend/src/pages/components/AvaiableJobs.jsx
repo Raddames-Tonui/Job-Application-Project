@@ -1,27 +1,24 @@
-import React from 'react';
 import { useJobContext } from '../context/JobContext';
+import JobCard from '../components/JobCard';
 
 const AvailableJobs = () => {
   const { jobs } = useJobContext();
 
   return (
     <div className="mt-10">
-      <h2 className="text-center text-2xl font-bold text-gray-900">Available Jobs</h2>
-      <div className="mt-6">
+      <h2 className="text-center text-3xl font-bold text-gray-900">Most Demanded Jobs Categories</h2>
+      <p className="text-center text-gray-500 mt-2 mb-6">Find the most demanded jobs categories</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {jobs.length > 0 ? (
-          <ul className="space-y-4">
-            {jobs.map(job => (
-              <li key={job.id} className="bg-white p-4 rounded shadow-md">
-                <h3 className="text-xl font-semibold">{job.title}</h3>
-                <p className="text-gray-700">{job.description}</p>
-                <p className="text-gray-500">{job.requirements}</p>
-              </li>
-            ))}
-          </ul>
+          jobs.map(job => (
+            <JobCard key={job.id} job={job} />
+          ))
         ) : (
-          <p className="text-center text-gray-500">No jobs available.</p>
+          <p className="col-span-full text-center text-gray-500">No jobs available.</p>
         )}
       </div>
+      
+     <hr />
     </div>
   );
 };
