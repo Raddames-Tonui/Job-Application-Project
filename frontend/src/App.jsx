@@ -25,7 +25,6 @@ function App() {
               <Routes>
                 <Route path="/" element={<Layout />}>
                   <Route index element={<LandingPage />} />
-                  <Route path="/fetch" element={<Fetch />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignUpForm />} />
                   <Route path="/register-company"  element={<RegisterCompanyPage />}/>

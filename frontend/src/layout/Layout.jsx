@@ -6,7 +6,7 @@ import { Outlet } from "react-router-dom";
 
 function Layout() {
   return (
-    <div>
+    <div className="h-screen overflow-y-scroll no-scrollbar">
       <Navbar />
       <ToastContainer />
 
