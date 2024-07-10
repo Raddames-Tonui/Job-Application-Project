@@ -29,11 +29,8 @@ function App() {
                   <Route path="/fetch" element={<Fetch />} />
                   <Route path="/login" element={<LoginPage />} />
                   <Route path="/signup" element={<SignUpForm />} />
-                  <Route
-                    path="/register-company"
-                    element={<RegisterCompanyPage />}
-                  />
-                  <Route path="/search-jobs" element={<JobSearchPage />} />
+                  <Route path="/register-company"  element={<RegisterCompanyPage />}/>
+                  <Route path="/search-jobs" element={<JobSearchPage />} />                  
                   <Route path="*" element={<NoPage />} />
                 </Route>
               </Routes>

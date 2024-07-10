@@ -40,12 +40,14 @@ function LandingPage() {
           </div>
         </div>
         
-        <div className="mt-10 flex justify-center"></div>
+        <div className="mt-10 flex justify-center">
+      {/* <AvailableJobs/> */}
+
+        </div>
       </div>
       <div className="">
        
       </div>
-      
     </div>
   );
 }
