@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
+
 const LandingPage = () => {
   const [email, setEmail] = useState('');
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Subscribe user to newsletter
-    console.log('Subscribing email:', email);
-    // Reset the form
-    setEmail('');
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Logic for handling form submission
+    console.log('Form submitted with email:', email);
   };
 
   return (
@@ -43,6 +42,10 @@ const LandingPage = () => {
       </div>
     </div>
   );
-}
+};
 
 export default LandingPage;
+
+
+
+  
