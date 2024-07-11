@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import backgroundImage from "../assets/cover_photo.jpg";
 import Footer from "../components/Footer";
 import FilteredJobs from "../components/FilteredJobs";
 import AvailableJobs from "../components/AvailableJobs";
 import { useNavigate } from "react-router-dom";
+// import { UserContext } from "../context/UserContext";
 
 function LandingPage() {
+
   
   const [jobs, setJobs] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const navigate = useNavigate();
+  // const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetch('http://127.0.0.1:5555/jobs')

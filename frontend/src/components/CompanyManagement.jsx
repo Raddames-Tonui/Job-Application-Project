@@ -26,8 +26,8 @@ function CompanyManagement({
   const handleAddNewCompany = (e) => {
     e.preventDefault();
     handleSubmitCompany(newCompany).then((data) => {
-      setCompanies([...companies, data]); // Update the list of companies
-      setNewCompany({ name: "", description: "", location: "" }); // Reset form fields
+      setCompanies([...companies, data]); 
+      setNewCompany({ name: "", description: "", location: "" }); 
       setShowAddModal(false);
     }).catch((error) => {
       console.error('Error creating company:', error);

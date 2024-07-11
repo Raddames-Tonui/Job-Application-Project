@@ -37,44 +37,52 @@ const JobManagement = ({ jobs, handleUpdateJob, handleDeleteJob, handleSubmitJob
         Add New Job
       </button>
 
-      <table className="min-w-full bg-white border border-gray-300">
-        <thead>
-          <tr className="bg-gray-200 text-gray-600 text-sm leading-normal">
-            <th className="border-b border-gray-300 px-4 py-2">Job Title</th>
-            <th className="border-b border-gray-300 px-4 py-2">Company</th>
-            <th className="border-b border-gray-300 px-4 py-2">Description</th>
-            <th className="border-b border-gray-300 px-4 py-2">Applicants</th>
-            <th className="border-b border-gray-300 px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {jobs.map((job) => (
-            <tr key={job.id} className="hover:bg-gray-100">
-              <td className="border-b border-gray-300 px-4 py-2 text-gray-800 font-semibold">{job.title}</td>
-              <td className="border-b border-gray-300 px-4 py-2 text-gray-600">{job.company.name}</td>
-              <td className="border-b border-gray-300 px-4 py-2 text-gray-700">{job.description}</td>
-              <td className="border-b border-gray-300 px-4 py-2">3</td>
-              <td className="border-b border-gray-300 px-4 py-2 flex justify-end">
-                <button
-                  className="bg-blue-500 text-white rounded-md px-4 py-2 mr-2"
-                  onClick={() => {
-                    setCurrentJob(job);
-                    setShowUpdateForm(true);
-                  }}
-                >
-                  Update
-                </button>
-                <button
-                  className="bg-red-500 text-white rounded-md px-4 py-2"
-                  onClick={() => handleDeleteJob(job.id)}
-                >
-                  Delete
-                </button>
-              </td>
+     <div className="flex flex-col">
+  <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
+    <div className="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+      <div className="overflow-hidden">
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead className="bg-gray-200 text-gray-600 text-sm leading-normal">
+            <tr>
+              <th className="border-b border-gray-300 px-4 py-2">Job Title</th>
+              <th className="border-b border-gray-300 px-4 py-2">Company</th>
+              <th className="border-b border-gray-300 px-4 py-2">Description</th>
+              <th className="border-b border-gray-300 px-4 py-2">Applicants</th>
+              <th className="border-b border-gray-300 px-4 py-2">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {jobs.map((job) => (
+              <tr key={job.id} className="hover:bg-gray-100">
+                <td className="border-b border-gray-300 px-4 py-2 text-gray-800 font-semibold">{job.title}</td>
+                <td className="border-b border-gray-300 px-4 py-2 text-gray-600">{job.company.name}</td>
+                <td className="border-b border-gray-300 px-4 py-2 text-gray-700">{job.description}</td>
+                <td className="border-b border-gray-300 px-4 py-2">3</td>
+                <td className="border-b border-gray-300 px-4 py-2 flex justify-end">
+                  <button
+                    className="bg-blue-500 text-white rounded-md px-3"
+                    onClick={() => {
+                      setCurrentJob(job);
+                      setShowUpdateForm(true);
+                    }}
+                  >
+                    Update
+                  </button>
+                  <button
+                    className="bg-red-500 text-white rounded-md px-4 py-3"
+                    onClick={() => handleDeleteJob(job.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Add New Job Form */}
       {showCreateForm && (
