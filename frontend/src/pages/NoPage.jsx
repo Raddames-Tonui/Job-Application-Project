@@ -1,13 +1,13 @@
 import React, { useContext } from "react";
-import { UserContext } from "./context/UserContext";
+import { UserContext } from "../context/UserContext";
 
 function NoPage() {
-  const { register } = useContext(UserContext);
-  console.log(register());
+  // const { register } = useContext(UserContext);
+  // console.log(register());
 
   return (
     <div>
-      <h2>No Page Found</h2>
+      <h2>No such page</h2>
     </div>
   );
 }

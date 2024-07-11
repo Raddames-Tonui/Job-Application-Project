@@ -29,9 +29,8 @@ export const UserProvider = ({ children }) => {
         alert("Registration successful. Please login.");
       } else if (res.message === "User with this email or username already exists") {
         alert("User with this email or username already exists.");
-      } else {
-        alert("Something went wrong.");
-      }
+      } 
+      
     });
   };
 
@@ -52,7 +51,7 @@ export const UserProvider = ({ children }) => {
       if (res.access_token) {
         setAuthToken(res.access_token);
         localStorage.setItem('token', res.access_token);
-        nav('/dashboard');
+        nav(`/userdashboard`);
         alert("Login successful.");
       } else {
         alert("Invalid username or password.");
@@ -63,7 +62,7 @@ export const UserProvider = ({ children }) => {
   // Logout User
   const logout = () => {
     fetch('http://localhost:5555/logout', {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${authToken}`

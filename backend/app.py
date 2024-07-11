@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import random
+import os
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,10 +16,11 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["JWT_SECRET_KEY"] = "$hhjdfsjhk43834892893" + str(random.randint(1, 1000000))
-app.config["SECRET_KEY"] = "$hhjd4%^#7&893" + str(random.randint(1, 1000000))
+
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('DATABASE_URI', "sqlite:///app.db")
+app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY', "$hhjdfsjhk43834892893" + str(random.randint(1, 1000000)))
+app.config["SECRET_KEY"] = os.getenv('SECRET_KEY', "$hhjd4%^#7&893" + str(random.randint(1, 1000000)))
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 
 app.json.compact = False 
@@ -59,6 +61,7 @@ def get_current_user():
         }), 200
     else:
         return jsonify({"Error": "User not found"}), 404
+        
 
 # Logout
 BLACKLIST = set()
@@ -67,12 +70,13 @@ BLACKLIST = set()
 def check_if_token_in_blocklist(jwt_header, decrypted_token):
     return decrypted_token["jti"] in BLACKLIST
 
-@app.route("/logout", methods=["POST"])
+@app.route("/logout", methods=["DELETE"])
 @jwt_required()
 def logout():
     jti = get_jwt()["jti"]
     BLACKLIST.add(jti)
-    return jsonify({"messsage": "Successfully logged out"}), 200
+    return jsonify({"message": "Successfully logged out"}), 200
+
 
 # ============================================ ROUTES ==============================================
 
@@ -101,12 +105,15 @@ def get_user(id):
 def create_user():
     data = request.get_json()
 
+    if not data.get('username') or not data.get('email') or not data.get('password'):
+        return jsonify({"message": "Username, email, and password are required"}), 400
+
     new_user = User(
         username=data['username'],
         email=data['email'],
         password=bcrypt.generate_password_hash(data['password']).decode('utf-8'),
         is_admin=data.get('is_admin', False),
-        profile_pictures = data.get('profile_pictures', None)
+        profile_pictures=data.get('profile_pictures', None)
     )
 
     try:
@@ -116,6 +123,7 @@ def create_user():
     except IntegrityError:
         db.session.rollback()
         return jsonify({"message": "User with this email or username already exists"}), 400
+
 
 # PUT update a user by ID
 @app.route('/users/<int:id>', methods=['PUT'])
@@ -171,7 +179,7 @@ def delete_user(id):
 def get_all_jobs():
     jobs = Job.query.all()
     job_list = [job.to_dict() for job in jobs]
-    return jsonify({"jobs": job_list}), 200
+    return jsonify(job_list), 200
 
 # GET a specific job by ID
 @app.route('/jobs/<int:id>', methods=['GET'])
@@ -261,7 +269,7 @@ def replace_job(id):
 
 # DELETE a job by ID
 @app.route('/jobs/<int:id>', methods=['DELETE'])
-@jwt_required()
+# @jwt_required()
 def delete_job(id):
     current_user_id = get_jwt_identity()
     current_user = User.query.get(current_user_id)
@@ -301,18 +309,21 @@ def get_company(id):
     if not company:
         return jsonify({"message": "Company not found"}), 404
     return jsonify(company.to_dict()), 200
-
 # POST create a new company
 @app.route('/companies', methods=['POST'])
-@jwt_required()
+# @jwt_required()  # Uncomment when JWT authentication is required
 def create_company():
-    current_user_id = get_jwt_identity()
-    current_user = User.query.get(current_user_id)
-
-    if not current_user.is_admin:
-        return jsonify({"message": "Access forbidden"}), 403
+    # Example of JWT authentication and admin check (uncomment when needed)
+    # current_user_id = get_jwt_identity()
+    # current_user = User.query.get(current_user_id)
+    # if not current_user.is_admin:
+    #     return jsonify({"message": "Access forbidden"}), 403
 
     data = request.get_json()
+    
+    # Example of validation (you may want to add more robust validation)
+    if not data or 'name' not in data or 'description' not in data or 'location' not in data:
+        return jsonify({"message": "Missing required data"}), 400
 
     new_company = Company(
         name=data['name'],
@@ -322,17 +333,19 @@ def create_company():
 
     db.session.add(new_company)
     db.session.commit()
+
     return jsonify({"message": "Company created successfully", "company": new_company.to_dict()}), 201
+
 
 # PATCH update a company by ID
 @app.route('/companies/<int:id>', methods=['PATCH'])
-@jwt_required()
+# @jwt_required()
 def update_company(id):
-    current_user_id = get_jwt_identity()
-    current_user = User.query.get(current_user_id)
+    # current_user_id = get_jwt_identity()
+    # current_user = User.query.get(current_user_id)
 
-    if not current_user.is_admin:
-        return jsonify({"message": "Access forbidden"}), 403
+    # if not current_user.is_admin:
+    #     return jsonify({"message": "Access forbidden"}), 403
 
     company = Company.query.get(id)
     if not company:
@@ -354,13 +367,13 @@ def update_company(id):
 
 # DELETE a company by ID
 @app.route('/companies/<int:id>', methods=['DELETE'])
-@jwt_required()
+# @jwt_required()
 def delete_company(id):
-    current_user_id = get_jwt_identity()
-    current_user = User.query.get(current_user_id)
+    # current_user_id = get_jwt_identity()
+    # current_user = User.query.get(current_user_id)
 
-    if not current_user.is_admin:
-        return jsonify({"message": "Access forbidden"}), 403
+    # if not current_user.is_admin:
+    #     return jsonify({"message": "Access forbidden"}), 403
 
     company = Company.query.get(id)
     if not company:
@@ -389,7 +402,7 @@ def get_application(id):
 
 # POST create a new application
 @app.route('/applications', methods=['POST'])
-@jwt_required()
+# @jwt_required()
 def create_application():
     current_user_id = get_jwt_identity()
     data = request.get_json()
@@ -406,7 +419,7 @@ def create_application():
 
 # PATCH update an application by ID
 @app.route('/applications/<int:id>', methods=['PATCH'])
-@jwt_required()
+# @jwt_required()
 def update_application(id):
     current_user_id = get_jwt_identity()
     application = Application.query.get(id)
@@ -425,7 +438,7 @@ def update_application(id):
 
 # PUT replace an application by ID
 @app.route('/applications/<int:id>', methods=['PUT'])
-@jwt_required()
+# @jwt_required()
 def replace_application(id):
     current_user_id = get_jwt_identity()
     application = Application.query.get(id)
@@ -444,7 +457,7 @@ def replace_application(id):
 
 # DELETE an application by ID
 @app.route('/applications/<int:id>', methods=['DELETE'])
-@jwt_required()
+# @jwt_required()
 def delete_application(id):
     current_user_id = get_jwt_identity()
     application = Application.query.get(id)

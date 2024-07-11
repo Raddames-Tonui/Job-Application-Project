@@ -1,24 +1,25 @@
-import { useContext, useState } from "react";
+
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserContext } from "./context/UserContext";
+import { UserContext } from "../context/UserContext";
 
 const LoginPage = () => {
-  const { login } = useContext(UserContext);
+  const { login } = useContext(UserContext);  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
     login(email, password);
+    setEmail("");
+    setPassword("");
   }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-4 text-center">Welcome Back!</h1>
-        <h3 className="text-gray-600  text-center">
-          Log in 
-        </h3>
+        <h3 className="text-gray-600 text-center">Log in</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700" htmlFor="email">
@@ -51,10 +52,7 @@ const LoginPage = () => {
             />
           </div>
           <div className="mb-6">
-            <Link
-              to="/forgot-password"
-              className="text-sm text-blue-600 hover:underline"
-            >
+            <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
               Forgot Password?
             </Link>
           </div>
