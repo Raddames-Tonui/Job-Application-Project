@@ -1,9 +1,9 @@
-
 import React, { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const { login } = useContext(UserContext);  
 
   const [email, setEmail] = useState("");
@@ -11,7 +11,7 @@ const LoginPage = () => {
 
   function handleSubmit(e) {
     e.preventDefault();
-    login(email, password);
+    login(email, password, navigate); // Pass navigate function
     setEmail("");
     setPassword("");
   }

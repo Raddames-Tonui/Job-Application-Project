@@ -1,8 +1,7 @@
 import { useJobContext } from "../context/JobContext";
 import JobCard from "./JobCard";
 
-const AvailableJobs = () => {
-  const { jobs } = useJobContext();
+const AvailableJobs = ({jobs}) => {
 
     const avalableJobs = jobs.slice(0, 15);
   return (

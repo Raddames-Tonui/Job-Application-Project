@@ -1,16 +1,13 @@
 import { createContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const nav = useNavigate();
-
   const [authToken, setAuthToken] = useState(() => localStorage.getItem('token') ? localStorage.getItem('token') : null);
   const [currentUser, setCurrentUser] = useState(null);
 
   // Register User
-  const register = (username, email, password) => {
+  const register = (username, email, password, navigate) => {
     fetch('http://localhost:5555/users', {
       method: 'POST',
       headers: {
@@ -25,17 +22,16 @@ export const UserProvider = ({ children }) => {
     .then(res => res.json())
     .then(res => {
       if (res.message === "User created successfully") {
-        nav('/login');
+        navigate('/login');
         alert("Registration successful. Please login.");
       } else if (res.message === "User with this email or username already exists") {
         alert("User with this email or username already exists.");
       } 
-      
     });
   };
 
   // Login User
-  const login = (email, password) => {
+  const login = (email, password, navigate) => {
     fetch('http://localhost:5555/login', {
       method: 'POST',
       headers: {
@@ -51,16 +47,27 @@ export const UserProvider = ({ children }) => {
       if (res.access_token) {
         setAuthToken(res.access_token);
         localStorage.setItem('token', res.access_token);
-        nav(`/userdashboard`);
+  
+        // Check if the user is an admin and navigate accordingly
+        if (res.is_admin) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+        
         alert("Login successful.");
       } else {
         alert("Invalid username or password.");
       }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("An error occurred during login.");
     });
   };
 
   // Logout User
-  const logout = () => {
+  const logout = (navigate) => {
     fetch('http://localhost:5555/logout', {
       method: 'DELETE',
       headers: {
@@ -74,7 +81,7 @@ export const UserProvider = ({ children }) => {
         setAuthToken(null);
         localStorage.removeItem('token');
         setCurrentUser(null);
-        nav('/login');
+        navigate('/login');
         alert("Logged out successfully.");
       } else {
         alert("Failed to logout.");
@@ -106,6 +113,9 @@ export const UserProvider = ({ children }) => {
     login,
     logout
   };
+
+ 
+
 
   return (
     <UserContext.Provider value={contextData}>
