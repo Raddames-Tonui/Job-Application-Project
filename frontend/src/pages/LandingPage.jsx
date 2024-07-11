@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
 import backgroundImage from "../assets/cover_photo.jpg";
-import Footer from "./components/Footer";
-import { useJobContext } from "./context/JobContext";
-import FilteredJobs from "./components/FilteredJobs";
-import AvailableJobs from "./components/AvailableJobs";
+import Footer from "../components/Footer";
+import FilteredJobs from "../components/FilteredJobs";
+import AvailableJobs from "../components/AvailableJobs";
+import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
-  const { jobs } = useJobContext();
+  
+  const [jobs, setJobs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:5555/jobs')
+      .then(res => res.json())
+      .then(data => setJobs(data))
+      .catch(error => console.error('Error fetching jobs:', error));
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
