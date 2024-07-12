@@ -241,15 +241,19 @@ def replace_job(id):
 
 # DELETE a job by ID
 @app.route('/jobs/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_job(id):
     job = Job.query.get(id)
     if not job:
         return jsonify({"message": "Job not found"}), 404
+        db.session.delete(job)
+        db.session.commit()
+        return jsonify({"message": "Job deleted successfully"}), 200
+ 
+<<<<<<< Updated upstream
 
-    db.session.delete(job)
-    db.session.commit()
-    return jsonify({"message": "Job deleted successfully"}), 200
-
+=======
+>>>>>>> Stashed changes
 
 
 # ======================COMPANY ROUTES======================
@@ -350,9 +354,16 @@ def get_application(application_id):
     return jsonify({"application": application.to_dict()}), 200
 
 # POST create a new application
-@app.route('/applications', methods=['POST'])
-def create_application():
+@app.route('/applications/<int:job_id>', methods=['POST'])
+@jwt_required()
+def create_application(job_id):
     data = request.get_json()
+
+    current_user_id = get_jwt_identity()
+    current_user = User.query.get(current_user_id)
+
+    if current_user.is_admin:
+        return jsonify({"error": "Admins cannot register for events"}), 400
 
     new_application = Application(
         user_id=data['user_id'],
@@ -362,7 +373,7 @@ def create_application():
 
     db.session.add(new_application)
     db.session.commit()
-    return jsonify({"message": "Application created successfully", "application": new_application.to_dict()}), 201
+    return jsonify({"message": "Application created successfully"}), 201
 
 # PUT update an application by ID
 @app.route('/applications/<int:application_id>', methods=['PUT'])

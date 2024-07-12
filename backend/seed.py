@@ -12,6 +12,12 @@ def seed_data():
     with app.app_context():
         db.drop_all()
         db.create_all()
+
+<<<<<<< Updated upstream
+
+=======
+>>>>>>> Stashed changes
+        password_hash = bcrypt.check_password_hash("admin", "$2b$12$D7C7C7")
         
         
     
