@@ -3,15 +3,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
 const LoginPage = () => {
+  const {login} = useContext(UserContext)
+
   const navigate = useNavigate();
-  const { login } = useContext(UserContext);  
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function handleSubmit(e) {
     e.preventDefault();
-    login(email, password, navigate); // Pass navigate function
+    login(email, password, navigate); 
     setEmail("");
     setPassword("");
   }

@@ -401,15 +401,15 @@ def get_application(id):
     return jsonify(application.to_dict()), 200
 
 # POST create a new application
-@app.route('/applications', methods=['POST'])
-# @jwt_required()
-def create_application():
+@app.route('/applications/<int:job_id>', methods=['POST'])
+@jwt_required()
+def create_application(job_id):
     current_user_id = get_jwt_identity()
     data = request.get_json()
 
     new_application = Application(
         user_id=current_user_id,
-        job_id=data['job_id'],
+        job_id=job_id,
         status=data['status']
     )
 
@@ -417,16 +417,16 @@ def create_application():
     db.session.commit()
     return jsonify({"message": "Application created successfully", "application": new_application.to_dict()}), 201
 
+
 # PATCH update an application by ID
 @app.route('/applications/<int:id>', methods=['PATCH'])
-# @jwt_required()
+@jwt_required()
 def update_application(id):
     current_user_id = get_jwt_identity()
     application = Application.query.get(id)
 
     if not application:
         return jsonify({"message": "Application not found"}), 404
-
 
     data = request.get_json()
 
@@ -438,14 +438,13 @@ def update_application(id):
 
 # PUT replace an application by ID
 @app.route('/applications/<int:id>', methods=['PUT'])
-# @jwt_required()
+@jwt_required()
 def replace_application(id):
     current_user_id = get_jwt_identity()
     application = Application.query.get(id)
 
     if not application:
         return jsonify({"message": "Application not found"}), 404
-
 
     data = request.get_json()
 
@@ -457,14 +456,13 @@ def replace_application(id):
 
 # DELETE an application by ID
 @app.route('/applications/<int:id>', methods=['DELETE'])
-# @jwt_required()
+@jwt_required()
 def delete_application(id):
     current_user_id = get_jwt_identity()
     application = Application.query.get(id)
 
     if not application:
         return jsonify({"message": "Application not found"}), 404
-
 
     db.session.delete(application)
     db.session.commit()
@@ -482,6 +480,7 @@ def get_user_applications(user_id):
 
 # GET applications for a specific job
 @app.route('/jobs/<int:job_id>/applications', methods=['GET'])
+@jwt_required()
 def get_job_applications(job_id):
     job = Job.query.get(job_id)
     if not job:
@@ -489,6 +488,7 @@ def get_job_applications(job_id):
 
     applications = Application.query.filter_by(job_id=job_id).all()
     return jsonify({"applications": [application.to_dict() for application in applications]}), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5555)

@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
+import { toast } from "react-toastify";
 
 function SignUpForm() {
   const { register } = useContext(UserContext);
@@ -11,8 +12,16 @@ function SignUpForm() {
   const [repeatPassword, setRepeatPassword] = useState("");
 
   function handleSubmit(e) {
-    e.preventDefault();
-    register(username, email, password);
+    e.preventDefault()    
+    if (password !== repeatPassword) {
+      toast.error("Passwords do not match")
+    } else {
+      register(username, email, password);
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setRepeatPassword("");
+    }
   }
 
   return (

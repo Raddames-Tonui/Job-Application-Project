@@ -3,6 +3,7 @@ import JobCard from "./JobCard";
 
 const AvailableJobs = ({jobs}) => {
 
+
     const avalableJobs = jobs.slice(0, 15);
   return (
     <div >

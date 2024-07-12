@@ -51,7 +51,7 @@ class Job(db.Model, SerializerMixin):
     applications = db.relationship("Application", back_populates="job", cascade="all, delete-orphan")
     users = association_proxy("applications", "user", creator=lambda user: Application(user=user))
 
-    serialize_rules = ('-applications.job', '-created_at', '-updated_at')
+    serialize_rules = ('-applications.job',  '-updated_at')
 
     def to_dict(self):
         return {
@@ -61,6 +61,7 @@ class Job(db.Model, SerializerMixin):
             "requirements": self.requirements,
             "company": self.company.to_dict(),
             "users": [user.to_dict() for user in self.users],
+            "created_at": self.created_at,
         }
 
 class Company(db.Model, SerializerMixin):
