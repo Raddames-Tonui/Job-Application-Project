@@ -1,27 +1,26 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 const LoginPage = () => {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const formData = new FormData(event.target);
-    const userData = {
-      email: formData.get('email'),
-      password: formData.get('password'),
-    };
-    
-    // perform validation or send this data to your backend API here
-    console.log('User Data:', userData);
-    
-    // Reset 
-    event.target.reset();
-  };
+  const {login} = useContext(UserContext)
+
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    login(email, password, navigate); 
+    setEmail("");
+    setPassword("");
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold mb-4">Welcome Back!</h1>
-        <p className="text-gray-600 mb-8">Log in to your account to continue</p>
+        <h3 className="text-gray-600 text-center">Log in</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-gray-700" htmlFor="email">
@@ -31,6 +30,8 @@ const LoginPage = () => {
               type="email"
               id="email"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your email"
               required
@@ -44,17 +45,17 @@ const LoginPage = () => {
               type="password"
               id="password"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
               placeholder="Enter your password"
               required
             />
           </div>
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
-                Forgot Password?
-              </Link>
-            </div>
+          <div className="mb-6">
+            <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+              Forgot Password?
+            </Link>
           </div>
           <button
             type="submit"
@@ -65,7 +66,10 @@ const LoginPage = () => {
         </form>
         <div className="mt-6 text-center">
           <p className="text-gray-700">
-            New to our platform? <Link to="/signup" className="text-blue-600 hover:underline">Sign Up here</Link>
+            New to our platform?{" "}
+            <Link to="/signup" className="text-blue-600 hover:underline">
+              Sign Up here
+            </Link>
           </p>
         </div>
       </div>

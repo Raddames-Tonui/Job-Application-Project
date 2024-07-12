@@ -1,19 +1,11 @@
-
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Logo from '../assets/jobsearch.png';
 
 function Navbar({ currentUser, handleLogout, isOpen, setIsOpen, authToken }) {
-  const navigate = useNavigate();
-
   const closeMenu = () => setIsOpen(false);
 
-  const logoutHandler = () => {
-    handleLogout(); // Perform logout action
-    navigate('/login'); // Navigate to login page after logout
-    closeMenu(); // Close menu on mobile if open
-  };
-
+  
   return (
     <nav className="bg-gray-800 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -30,25 +22,26 @@ function Navbar({ currentUser, handleLogout, isOpen, setIsOpen, authToken }) {
           <div className="hidden md:flex flex-grow justify-end items-center space-x-4">
             <Link to="/" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
             {authToken ? (
-              <Link to="/dashboard" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                {currentUser && currentUser.is_admin ? "Users View" : "Jobs"}
-              </Link>
-            ) : (
-              <>
-                {currentUser ? (
-                  <Link to="/dashboard" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Users View</Link>
-                ) : (
-                  <Link to="/signup" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign up</Link>
-                )}
-              </>
-            )}
+                <Link to="/dashboard" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                {currentUser && currentUser.is_admin ? "Users View" : "Jobs"}</Link>
+            )
+            :
+            <>{currentUser ?
+                <Link to="/dashboard" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Users View</Link>
+                :
+                <Link to="/signup" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign up</Link>
 
+            }
+            </>
+            
+            }
+            
             {currentUser && currentUser.is_admin && (
               <Link to="/admin" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Admin</Link>
             )}
 
             {currentUser ? (
-              <button onClick={logoutHandler} className="text-white bg-blue-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-2xl text-base font-medium">
+              <button onClick={handleLogout} className="text-white bg-blue-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-2xl text-base font-medium">
                 Logout
               </button>
             ) : (
@@ -79,7 +72,7 @@ function Navbar({ currentUser, handleLogout, isOpen, setIsOpen, authToken }) {
             <Link to="/admin" className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white" onClick={closeMenu}>Admin</Link>
           )}
           {currentUser ? (
-            <button onClick={logoutHandler} className="inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-primary-accent-300 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong">
+            <button onClick={() => { handleLogout(); closeMenu(); }} className="inline-block rounded bg-primary px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-primary-3 transition duration-150 ease-in-out hover:bg-primary-accent-300 hover:shadow-primary-2 focus:bg-primary-accent-300 focus:shadow-primary-2 focus:outline-none focus:ring-0 active:bg-primary-600 active:shadow-primary-2 motion-reduce:transition-none dark:shadow-black/30 dark:hover:shadow-dark-strong dark:focus:shadow-dark-strong dark:active:shadow-dark-strong">
               Logout
             </button>
           ) : (

@@ -1,26 +1,33 @@
-import React, { useState, useEffect, useContext } from "react";
-import backgroundImage from "./assets/cover_photo.jpg";
-import Footer from "./components/Footer";
-import FilteredJobs from "./components/FilteredJobs";
-import AvailableJobs from "./components/AvailableJobs";
+import React, { useState, useEffect } from "react";
+import Footer from "../components/Footer";
+import FilteredJobs from "../components/FilteredJobs";
+import AvailableJobs from "../components/AvailableJobs";
 import { useNavigate } from "react-router-dom";
-// import { UserContext } from "../context/UserContext";
+
+import backgroundImage from "../assets/backgroundImage.jpeg";
 
 function LandingPage() {
-
-  
   const [jobs, setJobs] = useState([]);
-  // const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    fetch('http://127.0.0.1:5555/jobs')
-      .then(res => res.json())
-      .then(data => setJobs(data))
-      .catch(error => console.error('Error fetching jobs:', error));
-  }, []);
-
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    fetchJobs();
+  }, []);
+
+  const fetchJobs = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:5555/jobs');
+      if (!response.ok) {
+        throw new Error('Failed to fetch jobs');
+      }
+      const data = await response.json();
+      setJobs(data);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      // Handle error state or show a message to the user
+    }
+  };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -44,7 +51,7 @@ function LandingPage() {
   }, [isSearching]);
 
   return (
-    <div >
+    <div>
       <div
         className="bg-[#F3F4F6] pt-16 pb-32 px-4 sm:px-6 lg:pb-40 lg:px-8"
         style={{
@@ -55,7 +62,7 @@ function LandingPage() {
           height: "100vh",
         }}
       >
-        <div className="relative bg-white bg-opacity-10 p-6  rounded-lg shadow-lg">
+        <div className="relative bg-white bg-opacity-10 p-6 rounded-lg shadow-lg">
           <h1 className="text-center text-4xl font-bold leading-10 text-gray-900">
             There Is{" "}
             <span className="text-blue-500">Definitely An Opportunity</span>{" "}
@@ -65,7 +72,7 @@ function LandingPage() {
             Find Jobs, Employment & Career Opportunities
           </p>
           <div className="mt-10 flex justify-center">
-            <div className=" shadow-md rounded-lg p-4 flex">
+            <div className="shadow-md rounded-lg p-4 flex">
               <input
                 type="text"
                 className="p-2 w-[30vw] rounded-l-md border border-gray-300"
@@ -81,14 +88,11 @@ function LandingPage() {
             </div>
           </div>
           {searchQuery && (
-            <div className=" flex justify-center">
+            <div className="flex justify-center">
               <FilteredJobs filteredJobs={filteredJobs} />
             </div>
           )}
         </div>
-      </div>
-      <div>
-        
       </div>
       <AvailableJobs jobs={jobs} />
       <Footer />

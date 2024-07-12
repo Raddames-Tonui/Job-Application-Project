@@ -13,7 +13,7 @@ export const UserProvider = ({ children }) => {
 
   // Register User
   const register = (username, email, password) => {
-    fetch('http://localhost:5555/users', {
+    fetch('http://127.0.0.1:5555/users', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -33,40 +33,45 @@ export const UserProvider = ({ children }) => {
     });
 
   };
-
-  // Login User
-  const login = (email, password) => {
-    fetch('http://localhost:5555/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, password })
+// Login User
+const login = (email, password) => {
+  fetch('http://127.0.0.1:5555/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ 
+        email: email,
+        password: password,
     })
-    .then(res => res.json())
-    .then(res => {
-      if (res.access_token) {
-        setAuth_token(res.access_token);
-        localStorage.setItem('access_token', res.access_token);
+  })
+  .then(res => res.json())
+  .then(res => {
+    if (res.access_token) {
+      setAuth_token(res.access_token);
+      localStorage.setItem('access_token', res.access_token);
 
-        // Check if the user is an admin and navigate accordingly
-        if (res.is_admin) {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-
-        toast.success("Login successful.");
+      if (localStorage.getItem('access_token')) {
+        navigate('/admin'); 
       } else {
-        toast.error("Invalid username or password.");
+        navigate('/dashboard');  
       }
-    });
 
-  };
+      toast.success("Login successful.");
+    } else {
+      toast.error("Invalid username or password.");
+    }
+  })
+  .catch(error => {
+    console.error("Login error:", error);
+    toast.error("Login failed. Please try again later.");
+  });
+};
+
 
   // Update User
   const update_user = (name, phone_number, is_organizer, password) => {
-    const server_url = 'http://localhost:5555'; // Define server_url if not already defined
+    const server_url = 'http://127.0.0.1:5555'; // Define server_url if not already defined
     fetch(`${server_url}/users`, {
       method: 'PUT',
       body: JSON.stringify({
@@ -95,7 +100,7 @@ export const UserProvider = ({ children }) => {
 
 // Logout User
 const logout = () => {
-  fetch('http://localhost:5555/logout', {
+  fetch('http://127.0.0.1:5555/logout', {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -117,7 +122,7 @@ const logout = () => {
 
 useEffect(() => {
   if (auth_token) {
-    fetch('http://localhost:5555/current_user', {
+    fetch('http://127.0.0.1:5555/current_user', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -127,7 +132,7 @@ useEffect(() => {
     .then(res => res.json())
     .then(data => {
       if (data.email) {
-        setCurrentUser(data);
+        setCurrentUser(data.access_token);
       } else {
         localStorage.removeItem('access_token');
         setAuth_token(null);

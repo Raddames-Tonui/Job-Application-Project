@@ -1,4 +1,3 @@
-// NoPage.jsx
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -8,7 +7,6 @@ const NoPage = () => {
   useEffect(() => {
     const button = buttonRef.current;
 
-    // Function to update button position randomly within viewport
     const updateButtonPosition = () => {
       const randomX = Math.random() * (window.innerWidth - button.offsetWidth);
       const randomY = Math.random() * (window.innerHeight - button.offsetHeight);
@@ -17,10 +15,8 @@ const NoPage = () => {
       button.style.top = `${randomY}px`;
     };
 
-    // Update button position every 3 seconds (adjust as needed)
     const interval = setInterval(updateButtonPosition, 3000);
 
-    // Clean up interval on component unmount
     return () => clearInterval(interval);
   }, []);
 
@@ -30,10 +26,9 @@ const NoPage = () => {
       <p className="text-lg mb-8">The page you are looking for does not exist.</p>
 
       {/* Floating Button */}
-      <button ref={buttonRef} className="floating-button" >
-        <Link to="/">
-        Catch Me!
-        </Link></button>
+      <button ref={buttonRef} className="floating-button" aria-label="Return to Home Page">
+        <Link to="/">Catch Me!</Link>
+      </button>
     </div>
   );
 }
