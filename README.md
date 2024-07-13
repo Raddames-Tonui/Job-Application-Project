@@ -46,8 +46,8 @@
 
 ## Support and contact details
 - [Raddames Tonui](https://github.com/Raddames-Tonui)
-- [Brian Rotich]()
-- [Rehema Somo](rehemasomo)
+- [Brian Rotich](https://github.com/rotichbrian)
+- [Rehema Somo]([rehemasomo](https://github.com/rehemasomo))
 - [James Nyakundi](rotichbrian)
 
 
