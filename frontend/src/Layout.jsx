@@ -12,7 +12,7 @@ function Layout() {
 
   const handleLogout = () => {
     logout();
-    setIsOpen(true);
+    setIsOpen(false);
   };
 
   return (
