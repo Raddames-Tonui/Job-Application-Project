@@ -124,5 +124,5 @@ function SignUpForm() {
     </section>
   );
 }
-
 export default SignUpForm;
+

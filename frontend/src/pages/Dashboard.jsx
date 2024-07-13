@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { UserContext } from '../context/UserContext';
+import { server_url } from '../../config.json';
 
 const Dashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -12,7 +13,7 @@ const Dashboard = () => {
   }, []);
 
   const fetchJobs = () => {
-    fetch('http://127.0.0.1:5555/jobs')
+    fetch(`${server_url}/jobs`)
       .then((res) => {
         if (!res.ok) {
           throw new Error('Failed to fetch jobs');
@@ -42,7 +43,7 @@ const Dashboard = () => {
     };
  
   
-    fetch(`http://127.0.0.1:5555/applications/${jobId}`, requestOptions)
+    fetch(`${server_url}/applications/${jobId}`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
@@ -120,3 +121,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+

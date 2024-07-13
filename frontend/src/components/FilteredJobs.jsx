@@ -27,3 +27,4 @@ const FilteredJobs = ({ filteredJobs }) => {
 };
 
 export default FilteredJobs;
+

@@ -13,6 +13,8 @@ import SignUpForm from './pages/SignUpForm.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 
+import ApplyJob from './components/ApplyJob.jsx';
+
 import JobApplication from './components/JobApplication.jsx';
 
 function App() {
@@ -28,7 +30,9 @@ function App() {
               <Route path="/signup" element={<SignUpForm />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path='/user' element={<Dashboard/>}/>
-              <Route path="/jobs/apply/:id" element={<JobApplication />} />
+              <Route path="/jobs" element={<JobApplication />} />
+              <Route path="/jobs/apply/:id" element={<ApplyJob />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="*" element={<NoPage />} />
             </Route>
           </Routes>

@@ -45,8 +45,9 @@
    
 
 ## Support and contact details
-- [Raddames Tonui](raddamestonui95@gmail.com)
-- [Brian Rotich](rotichbrian891@gmail.com)
-- [Rehema Somo](rehemasomo30@gmail.com)
-- [James Nyakundi](Omarejames082@gmail.cokCom)
+- [Raddames Tonui](https://github.com/Raddames-Tonui)
+- [Brian Rotich](https://github.com/rotichbrian)
+- [Rehema Somo]([rehemasomo](https://github.com/rehemasomo))
+- [James Nyakundi](rotichbrian)
+
 

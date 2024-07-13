@@ -6,12 +6,11 @@ import random
 
 faker = Faker()
 
-print("Start seeding ....")
-
 def seed_data():
     with app.app_context():
         db.drop_all()
         db.create_all()
+
 
         password_hash = hashpw('password'.encode('utf-8'), gensalt())
         users = [
@@ -25,39 +24,43 @@ def seed_data():
 
         for user in users:
             db.session.add(user)
-
         db.session.commit()
 
-        
+        # Create companies
         companies = [
-            Company(name='Company A', description='Description A', location='Location A'),
-            Company(name='Company B', description='Description B', location='Location B')
+            Company(name='Company A', description=faker.paragraph(), location=faker.city()),
+            Company(name='Company B', description=faker.paragraph(), location=faker.city())
         ]
 
-        for _ in range(5):  
-            companies.append(Company(name=faker.company(), description=faker.text(), location=faker.city()))
+        # Create additional random companies
+        for _ in range(5):
+            companies.append(Company(
+                name=faker.company(),
+                description=faker.paragraph(),
+                location=faker.city()
+            ))
 
+        # Add companies to the session
         for company in companies:
             db.session.add(company)
-
         db.session.commit()
 
+        # Create jobs
         jobs = []
-        for _ in range(20):  
+        for _ in range(20):
             job = Job(
                 title=faker.job(),
-                description=faker.text(),
-                requirements=faker.text(),
+                description=faker.paragraph(),
+                requirements=faker.paragraph(),
                 company_id=random.choice(companies).id
             )
             jobs.append(job)
             db.session.add(job)
-
         db.session.commit()
 
-        
+        # Create applications
         applications = []
-        for _ in range(50):  
+        for _ in range(50):
             application = Application(
                 user_id=random.choice(users).id,
                 job_id=random.choice(jobs).id,
@@ -65,7 +68,6 @@ def seed_data():
             )
             applications.append(application)
             db.session.add(application)
-
         db.session.commit()
 
 if __name__ == '__main__':

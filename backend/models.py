@@ -3,6 +3,7 @@ from sqlalchemy import MetaData, func
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
 
+
 metadata = MetaData(naming_convention={
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
 })
@@ -18,6 +19,7 @@ class User(db.Model, SerializerMixin):
     password = db.Column(db.String(255), nullable=False)
     profile_pictures = db.Column(db.String(300))
     is_admin = db.Column(db.Boolean, default=False)
+    refresh_token = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, server_default=func.now())
     updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
 
@@ -33,6 +35,11 @@ class User(db.Model, SerializerMixin):
             "profile_pictures": self.profile_pictures,
             "is_admin": self.is_admin,
         }
+    def set_refresh_token(self, refresh_token):
+        self.refresh_token = refresh_token
+
+    def check_refresh_token(self, refresh_token):
+        return self.refresh_token == refresh_token
 
 class Job(db.Model, SerializerMixin):
     __tablename__ = "jobs"
@@ -44,13 +51,16 @@ class Job(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=func.now())
     updated_at = db.Column(db.DateTime, server_default=func.now(), onupdate=func.now())
 
+
     company_id = db.Column(db.Integer, db.ForeignKey('companies.id'), nullable=False)
 
     company = db.relationship("Company", back_populates="jobs")
     applications = db.relationship("Application", back_populates="job", cascade="all, delete-orphan")
     users = association_proxy("applications", "user", creator=lambda user: Application(user=user))
 
-    serialize_rules = ('-applications.job', '-created_at', '-updated_at')
+    serialize_rules = ('-applications.job',  '-updated_at')
+
+
 
     def to_dict(self):
         return {
@@ -60,6 +70,7 @@ class Job(db.Model, SerializerMixin):
             "requirements": self.requirements,
             "company": self.company.to_dict(),
             "users": [user.to_dict() for user in self.users],
+            "created_at": self.created_at,
         }
 
 class Company(db.Model, SerializerMixin):

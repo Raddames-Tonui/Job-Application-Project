@@ -38,6 +38,7 @@ function LandingPage() {
     job.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+
   // Effect to toggle body overflow
   useEffect(() => {
     const handleScrollLock = () => {

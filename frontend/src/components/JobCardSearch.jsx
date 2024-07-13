@@ -43,3 +43,4 @@ function JobCardSearch({ job }) {
 }
 
 export default JobCardSearch;
+
