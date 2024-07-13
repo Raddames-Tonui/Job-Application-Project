@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import CompanyManagement from "../components/CompanyManagement";
 import JobManagement from "../components/JobManagement";
 import { toast } from "react-toastify";
 import { server_url } from "../../config.json";
-
+import { UserContext } from "../context/UserContext";
 function AdminDashboard() {
+  const { auth_token } = useContext(UserContext);
   const [showList, setShowList] = useState("company");
   const [companies, setCompanies] = useState([]);
   const [jobs, setJobs] = useState([]);
@@ -14,7 +15,11 @@ function AdminDashboard() {
   // FETCH
   useEffect(() => {
     setLoading(true);
-    fetch(`${server_url}/companies`)
+    fetch(`${server_url}/companies`, {
+      headers: {
+        Authorization: `Bearer ${auth_token}`
+      }
+    })
       .then((response) => response.json())
       .then((data) => {
         setCompanies(data);
@@ -25,7 +30,7 @@ function AdminDashboard() {
         toast.error("Error fetching companies");
         setLoading(false);
       });
-  }, [server_url]);
+  }, [server_url, auth_token]);
 
   // CREATE
   const handleSubmitCompany = (newCompany) => {
@@ -33,6 +38,7 @@ function AdminDashboard() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${auth_token}`
       },
       body: JSON.stringify(newCompany),
     })
@@ -58,6 +64,7 @@ function AdminDashboard() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${auth_token}`
       },
       body: JSON.stringify(updatedCompany),
     })
@@ -85,6 +92,9 @@ function AdminDashboard() {
   const handleDeleteCompany = (id) => {
     fetch(`${server_url}/companies/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${auth_token}`
+      }
     })
       .then((response) => {
         if (!response.ok) {
@@ -99,11 +109,16 @@ function AdminDashboard() {
       });
   };
 
+
   // ====================================CRUD JOB======================================
   // FETCH
   useEffect(() => {
     setLoading(true);
-    fetch(`${server_url}/jobs`)
+    fetch(`${server_url}/jobs`, {
+      headers: {
+        Authorization: `Bearer ${auth_token}`
+      }
+    })
       .then((response) => response.json())
       .then((data) => {
         setJobs(data);
@@ -114,7 +129,7 @@ function AdminDashboard() {
         toast.error("Error fetching jobs");
         setLoading(false);
       });
-  }, [server_url]);
+  }, [server_url, auth_token]);
 
   // CREATE
   const handleSubmitJob = (e) => {
@@ -128,6 +143,7 @@ function AdminDashboard() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${auth_token}`
       },
       body: JSON.stringify(job),
     })
@@ -153,6 +169,7 @@ function AdminDashboard() {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${auth_token}`
       },
       body: JSON.stringify(updatedJob),
     })
@@ -176,6 +193,9 @@ function AdminDashboard() {
   const handleDeleteJob = (id) => {
     fetch(`${server_url}/jobs/${id}`, {
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${auth_token}`
+      }
     })
       .then((response) => {
         if (!response.ok) {

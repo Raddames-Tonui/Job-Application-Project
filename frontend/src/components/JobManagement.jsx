@@ -19,9 +19,9 @@ const JobManagement = ({ jobs, handleUpdateJob, handleDeleteJob, handleSubmitJob
     if (job.id) {
       handleUpdateJob(job.id, job);
     } else {
-      handleSubmitJob(job);
+      handleSubmitJob(job); // Using handleSubmitJob from props to handle job submission
     }
-    setJob({ title: '', company: '', description: '', status: 'open' });
+    setJob({ title: '', company: '', description: '', requirements: '',status: 'open' });
     setShowForm(false);
   };
 
@@ -64,7 +64,7 @@ const JobManagement = ({ jobs, handleUpdateJob, handleDeleteJob, handleSubmitJob
                       <td className="border-b border-gray-300 px-4 py-2 text-gray-800 font-semibold">{job.title}</td>
                       <td className="border-b border-gray-300 px-4 py-2 text-gray-600">{job.company.name}</td>
                       <td className="border-b border-gray-300 px-4 py-2 text-gray-700">{job.description}</td>
-                      <td className="border-b border-gray-300 px-4 py-2">{job.applicants.length}</td>
+                      {/* <td className="border-b border-gray-300 px-4 py-2">{job.applicants.length}</td> */}
                       <td className="border-b border-gray-300 px-4 py-2 flex justify-end">
                         <button
                           className="bg-blue-500 text-white rounded-md px-3"

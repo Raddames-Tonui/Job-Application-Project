@@ -43,9 +43,14 @@ def login():
         refresh_token = create_refresh_token(identity=user.id)
         user.set_refresh_token(refresh_token)
         db.session.commit()
-        return jsonify(access_token=access_token, refresh_token=refresh_token), 200
+        return jsonify(
+            access_token=access_token, 
+            refresh_token=refresh_token, 
+            is_admin=user.is_admin  # Include user role
+        ), 200
     else:
         return jsonify({"message": "Check your username or password"}), 401
+
 
 
 # Refresh

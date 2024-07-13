@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+// { Add or Update Job }
 const JobForm = ({ job, handleInputChange, handleSubmit, handleCancel }) => (
   <div>
     <div className='absolute top-0 left-0 w-full h-full bg-black bg-opacity-50'></div>
