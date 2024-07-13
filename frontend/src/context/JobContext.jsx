@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
+import {server_url} from "../../config.json";
 
 const JobContext = createContext();
 
@@ -8,7 +9,7 @@ export const JobProvider = ({ children }) => {
   const [jobs, setJobs] = useState([]);
 
   const fetchJobs = async () => {
-    const response = await fetch("http://127.0.0.1:5555/jobs");
+    const response = await fetch(`${server_url}/jobs`);
     if (!response.ok) {
       throw new Error('Failed to fetch jobs');
     }
@@ -17,7 +18,7 @@ export const JobProvider = ({ children }) => {
   };
 
   const createJob = async (jobData) => {
-    const response = await fetch("http://127.0.0.1:5555/jobs", {
+    const response = await fetch(`${server_url}/jobs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +34,7 @@ export const JobProvider = ({ children }) => {
   };
 
   const updateJob = async (id, updatedJob) => {
-    const response = await fetch(`http://127.0.0.1:5555/jobs/${id}`, {
+    const response = await fetch(`${server_url}/jobs/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -47,7 +48,7 @@ export const JobProvider = ({ children }) => {
   };
 
   const deleteJob = async (id) => {
-    const response = await fetch(`http://127.0.0.1:5555/jobs/${id}`, {
+    const response = await fetch(`${server_url}/jobs/${id}`, {
       method: "DELETE",
     });
     if (!response.ok) {

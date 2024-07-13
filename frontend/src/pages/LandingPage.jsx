@@ -3,6 +3,7 @@ import Footer from "../components/Footer";
 import FilteredJobs from "../components/FilteredJobs";
 import AvailableJobs from "../components/AvailableJobs";
 import { useNavigate } from "react-router-dom";
+import {server_url} from "../../config.json";
 
 import backgroundImage from "../assets/backgroundImage.jpeg";
 
@@ -17,7 +18,7 @@ function LandingPage() {
 
   const fetchJobs = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5555/jobs');
+      const response = await fetch(`${server_url}/jobs`);
       if (!response.ok) {
         throw new Error('Failed to fetch jobs');
       }

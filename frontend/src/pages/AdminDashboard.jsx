@@ -2,24 +2,34 @@ import React, { useEffect, useState } from "react";
 import CompanyManagement from "../components/CompanyManagement";
 import JobManagement from "../components/JobManagement";
 import { toast } from "react-toastify";
+import { server_url } from "../../config.json";
 
 function AdminDashboard() {
   const [showList, setShowList] = useState("company");
   const [companies, setCompanies] = useState([]);
   const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // ====================================CRUD COMPANY======================================
   // FETCH
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/companies")
+    setLoading(true);
+    fetch(`${server_url}/companies`)
       .then((response) => response.json())
-      .then((data) => setCompanies(data))
-      .catch((error) => console.error("Error fetching companies:", error));
-  }, []);
+      .then((data) => {
+        setCompanies(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching companies:", error);
+        toast.error("Error fetching companies");
+        setLoading(false);
+      });
+  }, [server_url]);
 
   // CREATE
   const handleSubmitCompany = (newCompany) => {
-    fetch("http://127.0.0.1:5555/companies", {
+    fetch(`${server_url}/companies`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,12 +46,15 @@ function AdminDashboard() {
         setCompanies([...companies, data]);
         toast.success("Company created successfully");
       })
-      .catch((error) => console.error("Error creating company:", error));
+      .catch((error) => {
+        console.error("Error creating company:", error);
+        toast.error("Error creating company");
+      });
   };
 
   // UPDATE
   const handleUpdateCompany = (id, updatedCompany) => {
-    fetch(`http://127.0.0.1:5555/companies/${id}`, {
+    fetch(`${server_url}/companies/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -52,18 +65,25 @@ function AdminDashboard() {
         if (!response.ok) {
           throw new Error("Failed to update company");
         }
+        return response.json();
+      })
+      .then(() => {
         setCompanies(
           companies.map((company) =>
-            company.id === id ? updatedCompany : company
+            company.id === id ? { ...company, ...updatedCompany } : company
           )
         );
+        toast.success("Company updated successfully");
       })
-      .catch((error) => console.error("Error updating company:", error));
+      .catch((error) => {
+        console.error("Error updating company:", error);
+        toast.error("Error updating company");
+      });
   };
 
   // DELETE
   const handleDeleteCompany = (id) => {
-    fetch(`http://127.0.0.1:5555/companies/${id}`, {
+    fetch(`${server_url}/companies/${id}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -71,18 +91,30 @@ function AdminDashboard() {
           throw new Error("Failed to delete company");
         }
         setCompanies(companies.filter((company) => company.id !== id));
+        toast.success("Company deleted successfully");
       })
-      .catch((error) => console.error("Error deleting company:", error));
+      .catch((error) => {
+        console.error("Error deleting company:", error);
+        toast.error("Error deleting company");
+      });
   };
 
   // ====================================CRUD JOB======================================
   // FETCH
   useEffect(() => {
-    fetch("http://127.0.0.1:5555/jobs")
+    setLoading(true);
+    fetch(`${server_url}/jobs`)
       .then((response) => response.json())
-      .then((data) => setJobs(data))
-      .catch((error) => console.error("Error fetching jobs:", error));
-  }, []);
+      .then((data) => {
+        setJobs(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching jobs:", error);
+        toast.error("Error fetching jobs");
+        setLoading(false);
+      });
+  }, [server_url]);
 
   // CREATE
   const handleSubmitJob = (e) => {
@@ -92,7 +124,7 @@ function AdminDashboard() {
       description: e.target.description.value,
       status: "open",
     };
-    fetch("http://127.0.0.1:5555/jobs", {
+    fetch(`${server_url}/jobs`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,14 +138,18 @@ function AdminDashboard() {
         return response.json();
       })
       .then((data) => {
-        setJobs([...jobs, data])
-        toast.success("Job created successfully");})
-      .catch((error) => console.error("Error creating job:", error));
+        setJobs([...jobs, data]);
+        toast.success("Job created successfully");
+      })
+      .catch((error) => {
+        console.error("Error creating job:", error);
+        toast.error("Error creating job");
+      });
   };
 
   // UPDATE
   const handleUpdateJob = (id, updatedJob) => {
-    fetch(`http://127.0.0.1:5555/jobs/${id}`, {
+    fetch(`${server_url}/jobs/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -124,18 +160,21 @@ function AdminDashboard() {
         if (!response.ok) {
           throw new Error("Failed to update job");
         }
-        else
-        {
-          toast.success("Job updated successfully");
-        }
-        setJobs(jobs.map((job) => (job.id === id ? updatedJob : job)));
+        return response.json();
       })
-      .catch((error) => console.error("Error updating job:", error));
+      .then(() => {
+        setJobs(jobs.map((job) => (job.id === id ? { ...job, ...updatedJob } : job)));
+        toast.success("Job updated successfully");
+      })
+      .catch((error) => {
+        console.error("Error updating job:", error);
+        toast.error("Error updating job");
+      });
   };
 
   // DELETE
   const handleDeleteJob = (id) => {
-    fetch(`http://127.0.0.1:5555/jobs/${id}`, {
+    fetch(`${server_url}/jobs/${id}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -143,8 +182,12 @@ function AdminDashboard() {
           throw new Error("Failed to delete job");
         }
         setJobs(jobs.filter((job) => job.id !== id));
+        toast.success("Job deleted successfully");
       })
-      .catch((error) => console.error("Error deleting job:", error));
+      .catch((error) => {
+        console.error("Error deleting job:", error);
+        toast.error("Error deleting job");
+      });
   };
 
   return (
@@ -175,7 +218,9 @@ function AdminDashboard() {
         </div>
       </div>
       <hr />
-      {showList === "company" ? (
+      {loading ? (
+        <div>Loading...</div>
+      ) : showList === "company" ? (
         <CompanyManagement
           companies={companies}
           handleDeleteCompany={handleDeleteCompany}

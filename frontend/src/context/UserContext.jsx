@@ -2,6 +2,7 @@
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import {server_url} from "../../config.json";
 
 export const UserContext = createContext();
 
@@ -13,7 +14,7 @@ export const UserProvider = ({ children }) => {
 
   // Register User
   const register = (username, email, password) => {
-    fetch('http://127.0.0.1:5555/users', {
+    fetch(`${server_url}/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -35,7 +36,7 @@ export const UserProvider = ({ children }) => {
   };
 // Login User
 const login = (email, password) => {
-  fetch('http://127.0.0.1:5555/login', {
+  fetch(`${server_url}/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -71,7 +72,7 @@ const login = (email, password) => {
 
   // Update User
   const update_user = (name, phone_number, is_organizer, password) => {
-    const server_url = 'http://127.0.0.1:5555'; // Define server_url if not already defined
+    const server_url = '${server_url}'; // Define server_url if not already defined
     fetch(`${server_url}/users`, {
       method: 'PUT',
       body: JSON.stringify({
@@ -100,7 +101,7 @@ const login = (email, password) => {
 
 // Logout User
 const logout = () => {
-  fetch('http://127.0.0.1:5555/logout', {
+  fetch(`${server_url}/logout`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
@@ -122,7 +123,7 @@ const logout = () => {
 
 useEffect(() => {
   if (auth_token) {
-    fetch('http://127.0.0.1:5555/current_user', {
+    fetch(`${server_url}/current_user`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -147,8 +148,8 @@ useEffect(() => {
   }
 }, [auth_token, navigate]);
 
-  console.log(currentUser);
-  console.log(auth_token)
+  // console.log(currentUser);
+  // console.log(auth_token)
   const contextData = {
     auth_token,
     currentUser,
