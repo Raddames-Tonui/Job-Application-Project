@@ -64,13 +64,19 @@ const LoginPage = () => {
             Log In
           </button>
         </form>
-        <div className="mt-6 text-center">
+        <div className="mt-2 text-center">
           <p className="text-gray-700">
             New to our platform?{" "}
             <Link to="/signup" className="text-blue-600 hover:underline">
               Sign Up here
             </Link>
+
           </p>
+
+        </div>
+        <div className= "mt-2 text-center">
+              <p>Admin initial email: <span className="text-red-600">admin@gmail.com  </span> </p>
+              <p> Admin initial password: <span className="text-red-600"> 111 </span> </p>
         </div>
       </div>
     </div>

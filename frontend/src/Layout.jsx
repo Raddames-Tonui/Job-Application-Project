@@ -11,7 +11,7 @@ function Layout() {
     <div className="h-screen overflow-y-scroll no-scrollbar">
       <Navbar />
 
-      <ToastContainer />
+      <ToastContainer className={"absolute top-16  right-0"} />
 
       <Outlet />
     </div>

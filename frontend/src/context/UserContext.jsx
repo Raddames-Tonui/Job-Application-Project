@@ -50,7 +50,7 @@ export const UserProvider = ({ children }) => {
         setIsLoggedIn(true);
         localStorage.setItem('access_token', res.access_token);
         localStorage.setItem('refresh_token', res.refresh_token);
-        setCurrentUser({ ...res, email }); // Assuming the backend sends is_admin in the response
+        setCurrentUser({ ...res, email }); 
 
         if (res.is_admin) {
           navigate('/admin'); 
@@ -85,7 +85,7 @@ export const UserProvider = ({ children }) => {
         localStorage.removeItem("refresh_token");
         setAuth_token(null);
         setCurrentUser(null);
-        setIsLoggedIn(false);
+        setIsLoggedIn(false); 
         toast.success(res.success);
         navigate("/login");
       } else if (res.error) {
@@ -97,6 +97,7 @@ export const UserProvider = ({ children }) => {
       toast.error('Error logging out. Please try again.');
     });
   };
+  
 
   useEffect(() => {
     if (auth_token) {
@@ -128,7 +129,9 @@ export const UserProvider = ({ children }) => {
       });
     } else {
       setCurrentUser(null);
-      navigate("/login");
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/signup' && window.location.pathname !== '/home') {
+        navigate("/login");
+      }
     }
   }, [auth_token, navigate]);
 

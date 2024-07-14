@@ -9,6 +9,11 @@ const Navbar = () => {
 
   const closeMenu = () => setIsOpen(false);
 
+  const handleLogout = () => {
+    logout(); 
+    closeMenu();
+  };
+
   return (
     <nav className="bg-gray-800 text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -23,36 +28,28 @@ const Navbar = () => {
           {/* Navigation Links */}
           <div className="hidden md:flex flex-grow justify-end items-center space-x-4">
             <Link to="/home" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</Link>
-
-            {/* <Link to="/user" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Jobs</Link> */}
             
-            {currentUser && currentUser.email ? (
+            {isLoggedIn ? (
               <>
-                  {currentUser && currentUser.is_admin ? (
-                    <>
-                        <Link to="/admin" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Admin</Link>
-                        <Link to="/user" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Users View</Link>
-                    </>
-                    ) : (
-                    <>
-                        <Link to="/user" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Jobs</Link>
-                  
-                    </>
-                  )}             
-              <button onClick={() => logout()} className="text-white bg-blue-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-2xl text-base font-medium">
-                Logout
-              </button>
+                {currentUser && currentUser.is_admin ? (
+                  <>
+                    <Link to="/admin" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Admin</Link>
+                    <Link to="/user" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Users View</Link>
+                  </>
+                ) : (
+                  <Link to="/user" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Jobs</Link>
+                )}
+                <button onClick={handleLogout} className="text-white bg-blue-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-2xl text-base font-medium">
+                  Logout
+                </button>
               </>
             ) : (
               <>
-                  <Link to="/signup" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign up</Link>
-
-                  <Link to="/login"  className="text-white bg-blue-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-2xl text-base font-medium">
-                    Login
-                  </Link>
-              
-              </>             
-
+                <Link to="/signup" className="text-white hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Sign up</Link>
+                <Link to="/login" className="text-white bg-blue-500 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-2xl text-base font-medium">
+                  Login
+                </Link>
+              </>
             )}
           </div>
 
@@ -74,16 +71,15 @@ const Navbar = () => {
       <div className={`${isOpen ? 'block' : 'hidden'} md:hidden`}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link to="/home" className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white" onClick={closeMenu}>Home</Link>
-          <Link to="/dashboard" className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white" onClick={closeMenu}>Dashboard</Link>
-          {currentUser && currentUser.is_admin && (
+          {isLoggedIn && currentUser && currentUser.is_admin && (
             <Link to="/admin" className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white" onClick={closeMenu}>Admin</Link>
           )}
           {isLoggedIn ? (
-            <button onClick={() => { () =>logout() ,closeMenu(); }} className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white">
+            <button onClick={handleLogout} className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white">
               Logout
             </button>
           ) : (
-            <Link to="/login" onClick={() => {  closeMenu(); }} className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white">
+            <Link to="/login" onClick={closeMenu} className="text-white block px-3 py-2 rounded-md text-base font-medium hover:bg-gray-700 hover:text-white">
               Login
             </Link>
           )}

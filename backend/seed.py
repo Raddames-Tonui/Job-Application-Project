@@ -14,7 +14,8 @@ def seed_data():
 
         password_hash = hashpw('password'.encode('utf-8'), gensalt())
         users = [
-            User(username='admin', email='admin@example.com', password=password_hash, is_admin=True, profile_pictures="http://example.com/profile1.jpg"),
+            User(username='adminn', email='admin@example.com', password=password_hash, is_admin=True, profile_pictures="http://example.com/profile1.jpg"),
+            User(username='admin', email='admin@egmail.com', password=111, is_admin=True, profile_pictures="http://example.com/profile1.jpg"),
             User(username='user1', email='user1@example.com', password=password_hash, is_admin=False, profile_pictures="http://example.com/profile2.jpg"),
             User(username='user2', email='user2@example.com', password=password_hash, is_admin=False, profile_pictures="http://example.com/profile3.jpg")
         ]
