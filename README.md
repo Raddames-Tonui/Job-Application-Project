@@ -1,6 +1,7 @@
 # JOB APPLICATION PROJECT
 #### The app is a simple job application 8th July, 2024
 
+
 ### Developers
 - Raddames Tonui
 - Brian Rotich
