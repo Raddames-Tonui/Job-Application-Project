@@ -13,15 +13,16 @@ from flask_cors import CORS
 
 from dotenv import load_dotenv,dotenv_values
 
+load_dotenv()  # load .env file
 postgres_pwd = os.getenv("POSTGRES_PWD")  # config = {"USER": "foo", "EMAIL": "foo@example.org"}
 
-print(postgres_pwd)
+# print(postgres_pwd)
 
 app = Flask(__name__)
 CORS(app)
 
 # Replace these with your actual configuration values
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://jobsearch_db_2q7w_user:"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://jobsearch_db_6f4o_user:{postgres_pwd}"
 # "sqlite:///app.db"
 app.config["JWT_SECRET_KEY"] = "$hhjdfsjhk43834892893" + str(random.randint(1, 1000000))
 app.config["SECRET_KEY"] = "$hhjd4%^#7&893" + str(random.randint(1, 1000000))
